@@ -4,6 +4,7 @@
       { nixpkgs.hostPlatform = "aarch64-darwin"; }
       { nixpkgs.overlays = [ config.flake.overlays.lix ]; }
       inputs.home-manager.darwinModules.home-manager
+      inputs.nix-homebrew.darwinModules.nix-homebrew
       {
         home-manager.useGlobalPkgs = true;
         home-manager.useUserPackages = true;
@@ -19,6 +20,13 @@
 
         # the lix installer owns the daemon and /etc/nix/nix.conf
         nix.enable = false;
+
+        # nix-darwin installs and owns Homebrew itself; the homebrew block
+        # below manages only what the Brewfile lists
+        nix-homebrew = {
+          enable = true;
+          user = config.flake.username;
+        };
 
         homebrew = {
           enable = true;

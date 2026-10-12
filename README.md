@@ -149,21 +149,22 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 # 1. lix owns the daemon — nix-darwin runs with nix.enable = false
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 
-# 2. homebrew — casks are managed by nix-darwin, brew itself is not
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# 2. clone omni — nix-homebrew installs homebrew itself on first switch
+git clone git@github.com:bfeitknecht/omni.git ~/.config/omni
+cd ~/.config/omni
 
-# 3. clone omni, first switch (nh comes with the config itself)
-cd ~/CODE/GENESIS/omni
-nix run nix-darwin#darwin-rebuild -- switch --flake .#auto
+# 3. first switch (nh comes with the config itself)
+sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#auto
 
-# from here on:
-nh darwin switch .#auto
+# from here on, from anywhere:
+nh darwin switch
 ```
 
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 
 ```nu
-cd /mnt/mac/CODE/GENESIS/omni   # or clone
+git clone git@github.com:bfeitknecht/omni.git ~/.config/omni
+cd ~/.config/omni
 nix run .#vm                    # console autologin; TCG when /dev/kvm is missing
 ```
 
