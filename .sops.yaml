@@ -1,0 +1,6 @@
+creation_rules:
+  # TODO: replace with your age public key after
+  #   age-keygen -o ~/.config/sops/age/keys.txt
+  # (prints the recipient: age-keygen -y ~/.config/sops/age/keys.txt)
+  - path_regex: secrets/.*\.sops\.ya?ml$
+    age: age1REPLACE_WITH_YOUR_AGE_PUBLIC_KEY
