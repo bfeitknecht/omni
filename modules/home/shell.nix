@@ -140,19 +140,24 @@
             fi
           }
 
-          command_not_found_handler() {
-            local db="''${XDG_CACHE_HOME:-''$HOME/.cache}/nix-index/files"
-            if [[ ! -s "''$db" ]]; then
-              print -u2 "comma: no nix-index database yet — build it once with: nix-index"
-              return 127
-            fi
-            comma "$@"
-          }
         ''
         + lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
 
           [[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
         '';
+      };
+
+      # bat everywhere: as cat, as the man pager, as the general pager
+      home.sessionVariables = {
+        MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+        PAGER = "bat";
+      };
+
+      programs.bat = {
+        enable = true;
+        config = {
+          paging = "never";
+        };
       };
 
       xdg.configFile."zsh/zimrc".text = ''
@@ -169,6 +174,7 @@
           edit_mode = "vi";
           show_banner = false;
         };
+        shellAliases.cat = "bat --paging=never";
         extraEnv = ''
           # the session-variable STARSHIP_CONFIG points at the zsh variant;
           # nushell selects its own (two-line) variant
@@ -179,27 +185,18 @@
           # here the right cell stays on line 1 (the indicator owns line 2)
           $env.config.render_right_prompt_on_last_line = false
 
-          # the prompt definitions call starship explicitly; the left prompt
-          # re-appends the newline that external capture strips — the
-          # indicator owns line 2
-          $env.PROMPT_COMMAND = { ||
-              let cmd_duration = if $env.CMD_DURATION_MS == "0823" { 0 } else { $env.CMD_DURATION_MS }
-              (
-                  ^${pkgs.starship}/bin/starship prompt
-                      --cmd-duration $cmd_duration
-                      $"--status=($env.LAST_EXIT_CODE)"
-                      --terminal-width (term size).columns
-              ) + "\n"
-          }
+          # the prompt definitions call starship explicitly; the newline +
+          # symbol are nu-side (the indicators) — starship's own output
+          # loses a trailing line_break on capture
+          $env.PROMPT_COMMAND = { || ^${pkgs.starship}/bin/starship prompt }
           $env.PROMPT_COMMAND_RIGHT = { ||
-              ^${pkgs.starship}/bin/starship prompt --right
-                  $"--status=($env.LAST_EXIT_CODE)"
-                  --terminal-width (term size).columns
+              ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
           }
 
-          $env.PROMPT_INDICATOR = ": "
-          $env.PROMPT_INDICATOR_VIM_INSERT = ": "
-          $env.PROMPT_INDICATOR_VIM_NORMAL = "$ "
+          # the indicators own line 2
+          $env.PROMPT_INDICATOR = "\n: "
+          $env.PROMPT_INDICATOR_VIM_INSERT = "\n: "
+          $env.PROMPT_INDICATOR_VIM_NORMAL = "\n$ "
 
           # submitted lines collapse to just the mode indicator — no path,
           # no right cell
@@ -234,10 +231,27 @@
             install -m 644 ${userMod} "${config.xdg.configHome}/nushell/user/mod.nu"
         '';
 
-      programs.zoxide.enable = true;
+      # F to correct the previous command
+      programs.pay-respects = {
+        enable = true;
+        enableZshIntegration = true;
+        enableNushellIntegration = true;
+      };
+
+      programs.zoxide = {
+        enable = true;
+        # zoxide takes over cd entirely
+        options = [ "--cmd cd" ];
+      };
       programs.direnv = {
         enable = true;
         nix-direnv.enable = true;
+      };
+
+      programs.atuin = {
+        enable = true;
+        enableZshIntegration = true;
+        enableNushellIntegration = true;
       };
     };
 }
