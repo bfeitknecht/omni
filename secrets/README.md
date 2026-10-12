@@ -1,34 +1,33 @@
 # secrets
 
-Encrypted per-user secrets (ssh keys, gpg keys, tokens), consumed by
-home-manager via sops-nix (`modules/home/secrets.nix`). Everything in here
-is encrypted at rest with age. Every encrypted file must carry the `.sops.`
-pre-extension: `<name>.sops.yaml`.
+Encrypted per-user secrets (ssh keys, tokens), consumed by home-manager via
+sops-nix. Everything here is encrypted at rest with age; encrypted files
+carry the `.sops.` pre-extension. Policy: one ed25519 ssh key per service,
+no RSA.
 
-## Bootstrap (once)
+The age key itself can never live inside sops — sops needs it to decrypt.
+It lives at `~/.config/sops/age/keys.txt` on each machine; new machines
+either generate a fresh key (then add its public half as a recipient below)
+or receive the key file out-of-band.
+
+## Bootstrap (once per machine)
 
 ```nu
-# 1. generate the age key — never commit it
+# 1. age identity — never commit the private half
+mkdir ~/.config/sops/age
 age-keygen -o ~/.config/sops/age/keys.txt
 
-# 2. print the public key and put it into .sops.yaml (creation_rules.age)
+# 2. print the public key, add it to .sops.yaml (creation_rules.age,
+#    comma-separated when several machines decrypt)
 age-keygen -y ~/.config/sops/age/keys.txt
 ```
 
-## Create the first secrets file
+## Gotchas
 
-```nu
-# opens $EDITOR; sops encrypts on save using the .sops.yaml rules
-sops secrets/secrets.sops.yaml
-```
-
-Then wire the entries in `modules/home/secrets.nix` (a commented example
-is there: ssh key material via `sops.secrets`, public keys as plain
-`home.file` entries since they are not secret).
-
-## Rotating / adding recipients
-
-```nu
-# re-encrypt in place after changing .sops.yaml
-sops updatekeys secrets/secrets.sops.yaml
-```
+- sops-nix **owns** the secret paths after activation (`~/.ssh/github`, …)
+  and rewrites them on every switch — back up `~/.ssh` before the first
+  secrets switch on a machine that already has keys, and make sure the
+  sops file holds the exact current key material.
+- nix reads **tracked** files only on a dirty tree: `git add` the sops file
+  before switching.
+- Rotating / adding recipients: `sops updatekeys secrets/secrets.sops.yaml`

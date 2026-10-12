@@ -159,10 +159,16 @@ cd ~/.config/omni
 # 4. first switch (nh comes with the config itself)
 sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#auto
 
+# 5. secrets — age key + encrypted store, then switch again
+#    (full runbook: secrets/README.md)
+age-keygen -y ~/.config/sops/age/keys.txt   # → .sops.yaml creation_rules
+sops secrets/secrets.sops.yaml
+nh darwin switch
+
 # from here on, from anywhere:
 nh darwin switch
 
-# later, once ssh keys are wired via sops: switch the remote to ssh
+# later, once the sops-managed key exists: switch the remote to ssh
 ```
 
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
@@ -194,6 +200,4 @@ iteration.
 
 - starship prompt (spec above) — both shells, two TOML documents under
   `~/.config/starship/`
-- sops secrets wiring (`secrets/secrets.sops.yaml` + authorized_keys for
-  devil)
 - podman (nixos only), openvpn/tailscale — undecided
