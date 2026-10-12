@@ -1,13 +1,24 @@
-{ config, lib, pkgs, ... }: {
-  flake.homeModules.ssh = { config, lib, pkgs, ... }: {
-    # one ed25519 key per service; the private halves live in
-    # secrets/secrets.sops.yaml, the public halves ride along for pasting
-    # into services. sops-nix owns these paths after activation. Declared
-    # only once that file exists (and is tracked), so machines without
-    # secrets yet keep switching.
-    sops.secrets = lib.mkIf
-      (builtins.pathExists ../../secrets/secrets.sops.yaml)
-      {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  flake.homeModules.ssh =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      # one ed25519 key per service; the private halves live in
+      # secrets/secrets.sops.yaml, the public halves ride along for pasting
+      # into services. sops-nix owns these paths after activation. Declared
+      # only once that file exists (and is tracked), so machines without
+      # secrets yet keep switching.
+      sops.secrets = lib.mkIf (builtins.pathExists ../../secrets/secrets.sops.yaml) {
         "ssh/github".path = "${config.home.homeDirectory}/.ssh/github";
         "ssh/github.pub".path = "${config.home.homeDirectory}/.ssh/github.pub";
         "ssh/forgejo".path = "${config.home.homeDirectory}/.ssh/forgejo";
@@ -16,38 +27,42 @@
         "ssh/tangled.pub".path = "${config.home.homeDirectory}/.ssh/tangled.pub";
       };
 
-    programs.ssh = {
-      enable = true;
+      # HM's built-in Host * defaults are deprecated; we declare everything
+      # we want explicitly below
+      programs.ssh.enableDefaultConfig = false;
 
-      includes = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-        "~/.orbstack/ssh/config"
-      ];
+      programs.ssh = {
+        enable = true;
 
-      # global defaults; with per-service keys, IdentitiesOnly is the policy.
-      # capitalized names: they must override HM's defaults for these exact
-      # keys (ssh_config is first-match-wins, duplicates would lose)
-      settings."*" = {
-        ForwardAgent = true;
-        AddKeysToAgent = true;
-        IdentitiesOnly = true;
-        ServerAliveInterval = 300;
-        ServerAliveCountMax = 12;
-      };
+        includes = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+          "~/.orbstack/ssh/config"
+        ];
 
-      settings."github.com" = {
-        user = "git";
-        identityFile = "~/.ssh/github";
-      };
+        # global defaults; with per-service keys, IdentitiesOnly is the policy.
+        # capitalized names: they must override HM's defaults for these exact
+        # keys (ssh_config is first-match-wins, duplicates would lose)
+        settings."*" = {
+          ForwardAgent = true;
+          AddKeysToAgent = true;
+          IdentitiesOnly = true;
+          ServerAliveInterval = 300;
+          ServerAliveCountMax = 12;
+        };
 
-      settings."git.0xbf.ch" = {
-        user = "git";
-        identityFile = "~/.ssh/forgejo";
-      };
+        settings."github.com" = {
+          user = "git";
+          identityFile = "~/.ssh/github";
+        };
 
-      settings."tangled.org" = {
-        user = "git";
-        identityFile = "~/.ssh/tangled";
+        settings."git.0xbf.ch" = {
+          user = "git";
+          identityFile = "~/.ssh/forgejo";
+        };
+
+        settings."tangled.org" = {
+          user = "git";
+          identityFile = "~/.ssh/tangled";
+        };
       };
     };
-  };
 }
