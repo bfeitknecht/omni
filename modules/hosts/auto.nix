@@ -21,6 +21,14 @@
         # the lix installer owns the daemon and /etc/nix/nix.conf
         nix.enable = false;
 
+        # zimfw's completion module owns compinit — the global one would
+        # populate _comps first (zim warning); promptInit stays out of the
+        # way until starship lands
+        programs.zsh = {
+          enableCompletion = false;
+          promptInit = "";
+        };
+
         # nix-darwin installs and owns Homebrew itself; the homebrew block
         # below manages only what the Brewfile lists
         nix-homebrew = {

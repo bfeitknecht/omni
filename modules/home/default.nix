@@ -5,6 +5,7 @@
       tools
       git
       editor
+      ghostty
       nix
       ssh
       secrets
