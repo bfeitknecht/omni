@@ -149,21 +149,26 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 # 1. lix owns the daemon — nix-darwin runs with nix.enable = false
 curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 
-# 2. clone omni — nix-homebrew installs homebrew itself on first switch
-git clone git@github.com:bfeitknecht/omni.git ~/.config/omni
+# 2. developer tools — git for the clone, toolchain for local builds
+xcode-select --install
+
+# 3. clone omni — nix-homebrew installs homebrew itself on first switch
+git clone https://github.com/bfeitknecht/omni.git ~/.config/omni
 cd ~/.config/omni
 
-# 3. first switch (nh comes with the config itself)
+# 4. first switch (nh comes with the config itself)
 sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#auto
 
 # from here on, from anywhere:
 nh darwin switch
+
+# later, once ssh keys are wired via sops: switch the remote to ssh
 ```
 
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 
 ```nu
-git clone git@github.com:bfeitknecht/omni.git ~/.config/omni
+git clone https://github.com/bfeitknecht/omni.git ~/.config/omni
 cd ~/.config/omni
 nix run .#vm                    # console autologin; TCG when /dev/kvm is missing
 ```
