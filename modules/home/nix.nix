@@ -1,4 +1,4 @@
-{ ... }: {
+{ inputs, ... }: {
   flake.homeModules.nix =
     {
       config,
@@ -7,11 +7,21 @@
       ...
     }:
     {
+      imports = [ inputs.nix-index-database.homeModules.nix-index ];
+
       home.packages = with pkgs; [
         any-nix-shell
         comma
         nix-output-monitor
       ];
+
+      # nix-index/nix-locate wrapped with the prebuilt database (no full
+      # nixpkgs eval); the cache symlink is what comma's handler checks
+      programs.nix-index = {
+        enable = true;
+        symlinkToCacheHome = true;
+        enableZshIntegration = false;
+      };
 
       programs.nh = {
         enable = true;
