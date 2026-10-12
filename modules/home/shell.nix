@@ -34,6 +34,7 @@
           truncate_to_repo = false;
         };
         shlvl = {
+          disabled = false;
           format = "$symbol";
           symbol = "#";
           repeat = true;
@@ -74,8 +75,10 @@
         };
       };
 
+      # no $line_break: the newline is re-appended to PROMPT_COMMAND nu-side
+      # (external capture strips it); the indicator owns line 2
       nuSettings = shared // {
-        format = "$username@$hostname:$directory$line_break";
+        format = "$username@$hostname:$directory";
       };
     in
     {
@@ -164,6 +167,7 @@
         enable = true;
         settings = {
           edit_mode = "vi";
+          show_banner = false;
         };
         extraEnv = ''
           # the session-variable STARSHIP_CONFIG points at the zsh variant;
@@ -175,11 +179,35 @@
           # here the right cell stays on line 1 (the indicator owns line 2)
           $env.config.render_right_prompt_on_last_line = false
 
+          # the prompt definitions call starship explicitly; the left prompt
+          # re-appends the newline that external capture strips — the
+          # indicator owns line 2
+          $env.PROMPT_COMMAND = { ||
+              let cmd_duration = if $env.CMD_DURATION_MS == "0823" { 0 } else { $env.CMD_DURATION_MS }
+              (
+                  ^${pkgs.starship}/bin/starship prompt
+                      --cmd-duration $cmd_duration
+                      $"--status=($env.LAST_EXIT_CODE)"
+                      --terminal-width (term size).columns
+              ) + "\n"
+          }
+          $env.PROMPT_COMMAND_RIGHT = { ||
+              ^${pkgs.starship}/bin/starship prompt --right
+                  $"--status=($env.LAST_EXIT_CODE)"
+                  --terminal-width (term size).columns
+          }
+
           $env.PROMPT_INDICATOR = ": "
           $env.PROMPT_INDICATOR_VIM_INSERT = ": "
           $env.PROMPT_INDICATOR_VIM_NORMAL = "$ "
 
-          $env.TRANSIENT_PROMPT_COMMAND = { || "$" }
+          # submitted lines collapse to just the mode indicator — no path,
+          # no right cell
+          $env.TRANSIENT_PROMPT_COMMAND = { || "" }
+          $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || "" }
+          $env.TRANSIENT_PROMPT_INDICATOR = ": "
+          $env.TRANSIENT_PROMPT_INDICATOR_VI_INSERT = ": "
+          $env.TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = "$ "
 
           use user *
         '';
