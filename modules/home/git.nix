@@ -2,7 +2,13 @@
   flake.homeModules.git = { pkgs, ... }: {
     programs.git = {
       enable = true;
-      settings.init.defaultBranch = "master";
+      settings = {
+        init.defaultBranch = "master";
+        user = {
+          name = "bfeitknecht";
+          email = "bfeitknecht@ethz.ch";
+        };
+      };
       ignores = [
         ".direnv/"
         ".private/"
