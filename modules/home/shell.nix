@@ -27,27 +27,13 @@
           configPath = "${config.xdg.configHome}/starship/starship.toml";
           settings = {
             add_newline = false;
-            format = "($custom.prompt )$character";
-            right_format = "($shlvl )($status )($custom.git )($custom.time)";
+            format = "(\${custom.prompt} )$character";
+            right_format = ''($shlvl)( $status)( \($git_branch( $git_state)$git_status\))'' + "( \${custom.time})";
 
-            username = {
-              format = "$user";
-              show_always = true;
-            };
-            hostname = {
-              format = "$hostname";
-              ssh_only = false;
-            };
-            directory = {
-              format = "$path";
-              truncation_length = 0;
-              truncate_to_repo = false;
-            };
             character = {
               success_symbol = "%";
               error_symbol = "X";
             };
-
             shlvl = {
               disabled = false;
               format = "$symbol";
@@ -62,50 +48,42 @@
             git_branch.format = "$branch";
             git_state.format = "$state( $progress_current/$progress_total) ";
             git_status = {
-              format = "$all_status$ahead_behind ";
+              format = " $all_status $ahead_behind";
               up_to_date = "=";
-              ahead = ">" + count;
-              behind = "<" + behind;
-              diverged = "><" + ahead + "/" + behind;
+              ahead = ">" + count + " ";
+              behind = "<" + behind + " ";
+              diverged = "><" + ahead + "/" + behind + " ";
               untracked = "%" + count;
               stashed = "$" + count;
               conflicted = "!" + count;
               modified = "*" + count;
               staged = "+" + count;
             };
-            time = {
-              disabled = false;
-              format = "$time";
-              time_format = "%Y-%m-%dT%H:%M:%S%z";
-            };
-            custom.git = {
-              format = "\($git_branch$git_state$git_status\)";
-              description = "The current Git information";
-              require_repo = true;
-            };
             custom.prompt = {
-              format = "$username@$hostname:$directory";
               description = "The left prompt (conditional)";
-              when = ''[[ -n "$TMUX" ||  -n "$ZED_TERM" ]]'';
+              format = "$output";
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
+              # user at host in directory
+              command = ''printf '%s@%s:%s' "$USER" "$HOST" '' + "\"\${PWD/#$HOME/~}\""; # holy abomination
               shell = [
                 "${pkgs.zsh}/bin/zsh"
                 "-f"
-                "-c"
               ];
             };
             custom.time = {
-              format = "$time";
+              format = "$output";
               description = "The current time (conditional)";
-              when = ''[[ -n "$TMUX" ||  -n "$ZED_TERM" ]]'';
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
+              # date with ISO format string
+              command = "date +'%Y-%m-%dT%H:%M:%S%z'";
               shell = [
                 "${pkgs.zsh}/bin/zsh"
                 "-f"
-                "-c"
               ];
             };
           };
           enableZshIntegration = true;
-          enableNushellIntegration = true;
+          enableNushellIntegration = false;
         };
 
       programs.zsh = {
@@ -175,7 +153,7 @@
         settings = {
           edit_mode = "vi";
           show_banner = false;
-          table_mode = "markdown";
+          table.mode = "markdown";
         };
         shellAliases.cat = "bat --paging=never";
         extraEnv = ''
@@ -186,22 +164,24 @@
           $env.config.render_right_prompt_on_last_line = false
 
           $env.PROMPT_COMMAND = { ||
-            ^${pkgs.starship}/bin/starship module custom.prompt
+            if ('TMUX' in $env or 'ZED_TERM' in $env) {
+              ""
+            } else {
+              (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
+            }
           }
-          # $env.PROMPT_COMMAND_RIGHT = { ||
-          #   ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
-          # }
+          $env.PROMPT_COMMAND_RIGHT = { ||
+            ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
+          }
 
           $env.PROMPT_INDICATOR = ""
-          $env.PROMPT_INDICATOR_VI_NORMAL = "\n$ "
-          $env.PROMPT_INDICATOR_VI_INSERT = "\n: "
-          $env.PROMPT_MULTILINE_INDICATOR = "\n... "
+          $env.PROMPT_INDICATOR_VI_NORMAL = "$ "
+          $env.PROMPT_INDICATOR_VI_INSERT = ": "
+          $env.PROMPT_MULTILINE_INDICATOR = "... "
 
           $env.TRANSIENT_PROMPT_COMMAND = { || "" }
           $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || "" }
-          $env.TRANSIENT_PROMPT_INDICATOR = "$ "
-          $env.TRANSIENT_PROMPT_INDICATOR_VI_INSERT = "$ "
-          $env.TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = "$ "
+          $env.TRANSIENT_PROMPT_INDICATOR = "$"
           $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = "    "
 
           use user *
