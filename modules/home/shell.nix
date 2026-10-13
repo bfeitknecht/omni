@@ -6,86 +6,6 @@
       pkgs,
       ...
     }:
-    let
-      # starship interpolates ${count}-style variables in format strings;
-      # built by concatenation so nix ${ interpolation stays out of the way
-      count = "$" + "{count}";
-      ahead = "$" + "{ahead_count}";
-      behind = "$" + "{behind_count}";
-
-      # shared between the two per-shell variants — zsh renders a single
-      # line closed by starship's character module, nushell renders two
-      # lines with the vim-aware indicator owning line 2
-      shared = {
-        add_newline = false;
-        right_format = "($shlvl )($status )$git_branch$git_state$git_status$time";
-
-        username = {
-          format = "$user";
-          show_always = true;
-        };
-        hostname = {
-          format = "$hostname";
-          ssh_only = false;
-          detect_env_vars = ["!TMUX" "!ZED_TERM"];
-        };
-        directory = {
-          format = "$path";
-          truncation_length = 0;
-          truncate_to_repo = false;
-        };
-        shlvl = {
-          disabled = false;
-          format = "$symbol";
-          symbol = "#";
-          repeat = true;
-          threshold = 1;
-        };
-        status = {
-          format = ''\[$status\]($style)'';
-          style = "bold red";
-        };
-        git_branch.format = ''\($branch'';
-        git_state.format = "$state( $progress_current/$progress_total) ";
-        git_status = {
-          # the closing paren lives here so the GIT cell always renders in a
-          # work tree (up_to_date =)
-          format = ''$all_status$ahead_behind\) '';
-          up_to_date = "=";
-          ahead = ">" + count;
-          behind = "<" + behind;
-          diverged = "><" + ahead + "/" + behind;
-          untracked = "%" + count;
-          stashed = "$" + count;
-          conflicted = "!" + count;
-          modified = "*" + count;
-          staged = "+" + count;
-        };
-        time = {
-          disabled = false;
-          format = "$time";
-          time_format = "%Y-%m-%dT%H:%M:%S%z";
-        };
-      };
-
-      zshSettings = shared // {
-        format = "($username@$hostname:$directory) $character";
-        character = {
-          success_symbol = "%";
-          error_symbol = "X";
-        };
-      };
-
-      nuSettings = shared // {
-        format = "($username@$hostname:$directory$line_break)";
-        # format = "($username@$hostname:$directory) $character";
-        # character = {
-        #   success_symbol = "";
-        #   error_symbol = "";
-        #   format = "\n$symbol";
-        # };
-      };
-    in
     {
       home.packages = [
         # nixpkgs ships zimfw.zsh without a bin wrapper
@@ -94,22 +14,99 @@
         '')
       ];
 
-      programs.starship = {
-        enable = true;
-        # per-shell configs: HM writes zsh.toml at configPath and exports
-        # STARSHIP_CONFIG via session variables; nushell re-points it at
-        # nushell.toml in env.nu (see extraEnv below)
-        configPath = "${config.xdg.configHome}/starship/zsh.toml";
-        settings = zshSettings;
-        enableZshIntegration = true;
-        # declarative `starship init nu` (built via runCommand) `use`d in
-        # extraConfig — reads STARSHIP_CONFIG at prompt render time
-        enableNushellIntegration = true;
-      };
+      programs.starship =
+        let
+          # starship interpolates ${count}-style variables in format strings;
+          # built by concatenation so nix ${ interpolation stays out of the way
+          count = "$" + "{count}";
+          ahead = "$" + "{ahead_count}";
+          behind = "$" + "{behind_count}";
+        in
+        {
+          enable = true;
+          configPath = "${config.xdg.configHome}/starship/starship.toml";
+          settings = {
+            add_newline = false;
+            format = "($custom.prompt )$character";
+            right_format = "($shlvl )($status )($custom.git )($custom.time)";
 
-      xdg.configFile."starship/nushell.toml".source =
-        (pkgs.formats.toml { }).generate "starship-nushell"
-          nuSettings;
+            username = {
+              format = "$user";
+              show_always = true;
+            };
+            hostname = {
+              format = "$hostname";
+              ssh_only = false;
+            };
+            directory = {
+              format = "$path";
+              truncation_length = 0;
+              truncate_to_repo = false;
+            };
+            character = {
+              success_symbol = "%";
+              error_symbol = "X";
+            };
+
+            shlvl = {
+              disabled = false;
+              format = "$symbol";
+              symbol = "#";
+              repeat = true;
+              threshold = 1;
+            };
+            status = {
+              format = ''\[$status\]($style)'';
+              style = "bold red";
+            };
+            git_branch.format = "$branch";
+            git_state.format = "$state( $progress_current/$progress_total) ";
+            git_status = {
+              format = "$all_status$ahead_behind ";
+              up_to_date = "=";
+              ahead = ">" + count;
+              behind = "<" + behind;
+              diverged = "><" + ahead + "/" + behind;
+              untracked = "%" + count;
+              stashed = "$" + count;
+              conflicted = "!" + count;
+              modified = "*" + count;
+              staged = "+" + count;
+            };
+            time = {
+              disabled = false;
+              format = "$time";
+              time_format = "%Y-%m-%dT%H:%M:%S%z";
+            };
+            custom.git = {
+              format = "\($git_branch$git_state$git_status\)";
+              description = "The current Git information";
+              require_repo = true;
+            };
+            custom.prompt = {
+              format = "$username@$hostname:$directory";
+              description = "The left prompt (conditional)";
+              when = ''[[ -n "$TMUX" ||  -n "$ZED_TERM" ]]'';
+              shell = [
+                "${pkgs.zsh}/bin/zsh"
+                "-f"
+                "-c"
+              ];
+            };
+            custom.time = {
+              format = "$time";
+              description = "The current time (conditional)";
+              when = ''[[ -n "$TMUX" ||  -n "$ZED_TERM" ]]'';
+              shell = [
+                "${pkgs.zsh}/bin/zsh"
+                "-f"
+                "-c"
+              ];
+            };
+          };
+          enableZshIntegration = true;
+          enableNushellIntegration = true;
+        };
 
       programs.zsh = {
         enable = true;
@@ -178,24 +175,27 @@
         settings = {
           edit_mode = "vi";
           show_banner = false;
+          table_mode = "markdown";
         };
         shellAliases.cat = "bat --paging=never";
         extraEnv = ''
-          $env.STARSHIP_CONFIG = ($nu.default-config-dir | path dirname | path join "starship" "nushell.toml")
+          $env.STARSHIP_CONFIG = ($nu.default-config-dir | path dirname | path join "starship" "starship.toml")
         '';
         extraConfig = ''
           $env.STARSHIP_SHELL = "nu"
           $env.config.render_right_prompt_on_last_line = false
 
-          # $env.PROMPT_COMMAND = { || ^${pkgs.starship}/bin/starship prompt }
+          $env.PROMPT_COMMAND = { ||
+            ^${pkgs.starship}/bin/starship module custom.prompt
+          }
           # $env.PROMPT_COMMAND_RIGHT = { ||
           #   ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
           # }
 
           $env.PROMPT_INDICATOR = ""
-          $env.PROMPT_INDICATOR_VI_NORMAL = "$ "
-          $env.PROMPT_INDICATOR_VI_INSERT = ": "
-          $env.PROMPT_MULTILINE_INDICATOR = "... "
+          $env.PROMPT_INDICATOR_VI_NORMAL = "\n$ "
+          $env.PROMPT_INDICATOR_VI_INSERT = "\n: "
+          $env.PROMPT_MULTILINE_INDICATOR = "\n... "
 
           $env.TRANSIENT_PROMPT_COMMAND = { || "" }
           $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || "" }
@@ -229,7 +229,7 @@
             install -m 644 ${userMod} "${config.xdg.configHome}/nushell/user/mod.nu"
         '';
 
-      # F to correct the previous command
+      # f to correct the previous command
       programs.pay-respects = {
         enable = true;
         enableZshIntegration = true;
