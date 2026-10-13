@@ -28,7 +28,7 @@
           settings = {
             add_newline = false;
             format = "(\${custom.prompt} )$character";
-            right_format = ''($shlvl)( $status)( \($git_branch( $git_state)$git_status\))'' + "( \${custom.time})";
+            right_format = ''($shlvl)( $status)( \($git_branch( $git_state)($git_status)\))'' + "( \${custom.time})";
 
             character = {
               success_symbol = "%";
@@ -48,11 +48,11 @@
             git_branch.format = "$branch";
             git_state.format = "$state( $progress_current/$progress_total) ";
             git_status = {
-              format = " $all_status $ahead_behind";
+              format = "( $all_status)( $ahead_behind)";
               up_to_date = "=";
-              ahead = ">" + count + " ";
-              behind = "<" + behind + " ";
-              diverged = "><" + ahead + "/" + behind + " ";
+              ahead = ">" + count;
+              behind = "<" + behind;
+              diverged = ">" + ahead + "<" + behind;
               untracked = "%" + count;
               stashed = "$" + count;
               conflicted = "!" + count;
