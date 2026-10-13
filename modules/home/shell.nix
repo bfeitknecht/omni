@@ -9,9 +9,9 @@
     let
       # starship interpolates ${count}-style variables in format strings;
       # built by concatenation so nix ${ interpolation stays out of the way
-      cnt = "$" + "{count}";
-      aheadCnt = "$" + "{ahead_count}";
-      behindCnt = "$" + "{behind_count}";
+      count = "$" + "{count}";
+      ahead = "$" + "{ahead_count}";
+      behind = "$" + "{behind_count}";
 
       # shared between the two per-shell variants — zsh renders a single
       # line closed by starship's character module, nushell renders two
@@ -27,6 +27,7 @@
         hostname = {
           format = "$hostname";
           ssh_only = false;
+          detect_env_vars = ["!TMUX" "!ZED_TERM"];
         };
         directory = {
           format = "$path";
@@ -51,14 +52,14 @@
           # work tree (up_to_date =)
           format = ''$all_status$ahead_behind\) '';
           up_to_date = "=";
-          ahead = ">" + cnt;
-          behind = "<" + behindCnt;
-          diverged = "><" + aheadCnt + "/" + behindCnt;
-          untracked = "%" + cnt;
-          stashed = "$" + cnt;
-          conflicted = "!" + cnt;
-          modified = "*" + cnt;
-          staged = "+" + cnt;
+          ahead = ">" + count;
+          behind = "<" + behind;
+          diverged = "><" + ahead + "/" + behind;
+          untracked = "%" + count;
+          stashed = "$" + count;
+          conflicted = "!" + count;
+          modified = "*" + count;
+          staged = "+" + count;
         };
         time = {
           disabled = false;
@@ -68,17 +69,21 @@
       };
 
       zshSettings = shared // {
-        format = "$username@$hostname:$directory $character";
+        format = "($username@$hostname:$directory) $character";
         character = {
           success_symbol = "%";
           error_symbol = "X";
         };
       };
 
-      # no $line_break: the newline is re-appended to PROMPT_COMMAND nu-side
-      # (external capture strips it); the indicator owns line 2
       nuSettings = shared // {
-        format = "$username@$hostname:$directory";
+        format = "($username@$hostname:$directory$line_break)";
+        # format = "($username@$hostname:$directory) $character";
+        # character = {
+        #   success_symbol = "";
+        #   error_symbol = "";
+        #   format = "\n$symbol";
+        # };
       };
     in
     {
@@ -176,35 +181,28 @@
         };
         shellAliases.cat = "bat --paging=never";
         extraEnv = ''
-          # the session-variable STARSHIP_CONFIG points at the zsh variant;
-          # nushell selects its own (two-line) variant
           $env.STARSHIP_CONFIG = ($nu.default-config-dir | path dirname | path join "starship" "nushell.toml")
         '';
         extraConfig = ''
-          # starship's nu init forces the right prompt onto the last line;
-          # here the right cell stays on line 1 (the indicator owns line 2)
+          $env.STARSHIP_SHELL = "nu"
           $env.config.render_right_prompt_on_last_line = false
 
-          # the prompt definitions call starship explicitly; the newline +
-          # symbol are nu-side (the indicators) — starship's own output
-          # loses a trailing line_break on capture
-          $env.PROMPT_COMMAND = { || ^${pkgs.starship}/bin/starship prompt }
-          $env.PROMPT_COMMAND_RIGHT = { ||
-              ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
-          }
+          # $env.PROMPT_COMMAND = { || ^${pkgs.starship}/bin/starship prompt }
+          # $env.PROMPT_COMMAND_RIGHT = { ||
+          #   ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
+          # }
 
-          # the indicators own line 2
-          $env.PROMPT_INDICATOR = "\n: "
-          $env.PROMPT_INDICATOR_VIM_INSERT = "\n: "
-          $env.PROMPT_INDICATOR_VIM_NORMAL = "\n$ "
+          $env.PROMPT_INDICATOR = ""
+          $env.PROMPT_INDICATOR_VI_NORMAL = "$ "
+          $env.PROMPT_INDICATOR_VI_INSERT = ": "
+          $env.PROMPT_MULTILINE_INDICATOR = "... "
 
-          # submitted lines collapse to just the mode indicator — no path,
-          # no right cell
           $env.TRANSIENT_PROMPT_COMMAND = { || "" }
           $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || "" }
-          $env.TRANSIENT_PROMPT_INDICATOR = ": "
-          $env.TRANSIENT_PROMPT_INDICATOR_VI_INSERT = ": "
+          $env.TRANSIENT_PROMPT_INDICATOR = "$ "
+          $env.TRANSIENT_PROMPT_INDICATOR_VI_INSERT = "$ "
           $env.TRANSIENT_PROMPT_INDICATOR_VI_NORMAL = "$ "
+          $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = "    "
 
           use user *
         '';
