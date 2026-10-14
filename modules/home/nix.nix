@@ -25,8 +25,7 @@
 
       programs.nh = {
         enable = true;
-        # the omni checkout convention; `nh darwin switch` / `nh os switch`
-        # work bare from anywhere
+        # `nh darwin switch` / `nh os switch` work bare from anywhere
         flake = "${config.home.homeDirectory}/.config/omni";
       };
 

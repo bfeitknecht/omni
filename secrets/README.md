@@ -1,9 +1,9 @@
 # secrets
 
-Encrypted per-user secrets (ssh keys, tokens), consumed by home-manager via
-sops-nix. Everything here is encrypted at rest with age; encrypted files
-carry the `.sops.` pre-extension. Policy: one ed25519 ssh key per service,
-no RSA.
+Encrypted per-user secrets (ssh keys, the gpg identity, tokens), consumed by
+home-manager via sops-nix. Everything here is encrypted at rest with age;
+encrypted files carry the `.sops.` pre-extension. Policy: one ed25519 ssh key
+per service, no RSA.
 
 The age key itself can never live inside sops — sops needs it to decrypt.
 It lives at `~/.config/sops/age/keys.txt` on each machine; new machines

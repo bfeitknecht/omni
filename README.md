@@ -132,8 +132,9 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │   ├── shell.nix         zsh (zimfw), nushell (`use user *`), zoxide, direnv
 │   ├── tools.nix         rg fd bat eza bottom television uv + dust tlrc age sops lua deno
 │   ├── git.nix           git delta jujutsu tea gh
-│   ├── editor.nix        neovim, helix
+│   ├── editor.nix        neovim (nvf), helix
 │   ├── nix.nix           nh comma nom any-nix-shell, nix.settings, lix as nix.package
+│   ├── gpg.nix           gpg identity (sops) + commit/tag signing
 │   └── secrets.nix       sops-nix HM module + age key location
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)

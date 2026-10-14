@@ -1,8 +1,22 @@
-{ ... }: {
+{ inputs, ... }: {
   flake.homeModules.editor = {
-    programs.neovim.enable = true;
-    programs.helix.enable = true;
+    imports = [ inputs.nvf.homeManagerModules.default ];
 
-    home.sessionVariables.EDITOR = "nvim";
+    programs.nvf = {
+      enable = true;
+      # sets EDITOR=nvim
+      defaultEditor = true;
+
+      settings.vim = {
+        viAlias = false;
+        vimAlias = true;
+        lineNumberMode = "relNumber";
+        searchCase = "smart";
+        undoFile.enable = true;
+        lsp.enable = true;
+      };
+    };
+
+    programs.helix.enable = true;
   };
 }

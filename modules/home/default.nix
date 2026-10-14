@@ -8,6 +8,7 @@
       ghostty
       nix
       ssh
+      gpg
       secrets
     ];
 
