@@ -193,9 +193,11 @@ docker push ghcr.io/bfeitknecht/devil:latest
 ```
 
 Inside the booted pod: clone omni, `nh os switch .#devil`; rebuild + retag +
-push the image from any NixOS host. ssh + web ports are routed to it through
-the talos gateway; ssh keys arrive via the sops HM class in a future
-iteration.
+push the image from any NixOS host. Access is teleport-only: the image runs a
+teleport agent (ssh_service) that dials the cluster's teleport proxy — no
+sshd, no ingress route. From a tailnet device: `tsh login --proxy
+teleport.internal`, then `tsh ssh bf@devil`. The node join token arrives as a
+mounted Secret (`/run/secrets/teleport-token`).
 
 ## deferred
 
