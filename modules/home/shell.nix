@@ -28,7 +28,8 @@
           settings = {
             add_newline = false;
             format = "(\${custom.prompt} )$character";
-            right_format = ''($shlvl)( $status)( \($git_branch( $git_state)($git_status)\))'' + "( \${custom.time})";
+            right_format =
+              ''($shlvl)( $status)( \($git_branch( $git_state)($git_status)\))'' + "( \${custom.time})";
 
             character = {
               success_symbol = "%";
@@ -230,6 +231,12 @@
         enable = true;
         enableZshIntegration = true;
         enableNushellIntegration = true;
+        # keep the up arrow as plain history navigation — ctrl-r is the picker
+        flags = [ "--disable-up-arrow" ];
+        # enter pulls the selection into the buffer, it does not run it
+        settings.enter_accept = false;
+        # atuin rewrites config.toml itself; let HM own the file
+        forceOverwriteSettings = true;
       };
     };
 }
