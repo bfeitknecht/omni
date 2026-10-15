@@ -190,8 +190,9 @@ so inside the vm: clone omni, `nh os switch .#vm`. Iterate on the host,
 # on a NixOS host — bootstrap only; day-to-day updates are `nh os switch`
 # from inside the pod. --platform matters only if the build host is x86_64.
 nix build .#devil
-docker import --platform linux/arm64 result/tarball/nixos-system-aarch64-linux.tar.xz ghcr.io/bfeitknecht/devil:0.1.0
-docker push ghcr.io/bfeitknecht/devil:0.1.0
+cp -L result/tarball/nixos-system-aarch64-linux.tar.xz .private/devil.tar.xz   # result points into the build host's nix store — dereference it
+docker import --platform linux/arm64 .private/devil.tar.xz ghcr.io/bfeitknecht/devil:latest   # run where the docker daemon lives (OrbStack: on the mac)
+docker push ghcr.io/bfeitknecht/devil:latest
 ```
 
 The image is only the bootstrap (the entrypoint lives in the infra tree's
