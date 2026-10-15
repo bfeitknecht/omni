@@ -57,6 +57,10 @@ let
             # Agents pin the host CA during the token join, so the
             # internal-CA-signed cert validates.
             auth_server: teleport.teleport.svc.cluster.local:443
+            # fingerprint of the auth host CA (tctl tokens add prints it);
+            # without it the token join cannot verify the proxy's
+            # internal-CA-signed cert. Public material — safe to embed.
+            ca_pin: sha256:943b04599846c81bfc6f6019894bcd6c5c1c2737ba49c3052f5850b055c10b22
           auth_service:
             enabled: "no"
           proxy_service:
@@ -69,14 +73,17 @@ let
         '';
 
         # join token arrives as a mounted k8s Secret (devil-teleport-token);
-        # --token accepts a file path
+        # --token accepts a file path. The pod mounts it at
+        # /etc/teleport-secrets, not /run/secrets — systemd inside the kata
+        # VM may classify itself as a VM and overmount /run with a tmpfs,
+        # hiding the secret mount.
         systemd.services.teleport = {
           description = "Teleport agent (ssh_service)";
           wantedBy = [ "multi-user.target" ];
           after = [ "network-online.target" ];
           wants = [ "network-online.target" ];
           serviceConfig = {
-            ExecStart = "${pkgs.teleport}/bin/teleport start --config=/etc/teleport/teleport.yaml --token=/run/secrets/teleport-token";
+            ExecStart = "${pkgs.teleport}/bin/teleport start --config=/etc/teleport/teleport.yaml --token=/etc/teleport-secrets/teleport-token";
             Restart = "on-failure";
             RestartSec = "5s";
           };

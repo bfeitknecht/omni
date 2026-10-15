@@ -187,17 +187,21 @@ so inside the vm: clone omni, `nh os switch .#vm`. Iterate on the host,
 ### devil — the kata pod image
 
 ```nu
-nix build .#devil   # on a NixOS host
-docker import --change 'CMD ["/init"]' result/tarball/nixos-system-aarch64-linux.tar.xz ghcr.io/bfeitknecht/devil:latest
-docker push ghcr.io/bfeitknecht/devil:latest
+# on a NixOS host — bootstrap only; day-to-day updates are `nh os switch`
+# from inside the pod. --platform matters only if the build host is x86_64.
+nix build .#devil
+docker import --platform linux/arm64 result/tarball/nixos-system-aarch64-linux.tar.xz ghcr.io/bfeitknecht/devil:0.1.0
+docker push ghcr.io/bfeitknecht/devil:0.1.0
 ```
 
-Inside the booted pod: clone omni, `nh os switch .#devil`; rebuild + retag +
-push the image from any NixOS host. Access is teleport-only: the image runs a
+The image is only the bootstrap (the entrypoint lives in the infra tree's
+`applications/devil/deployment.yaml` as `command: ["/init"]`). Inside the
+booted pod: clone omni, `nh os switch .#devil` — day-to-day
+updates never touch the image. Access is teleport-only: the image runs a
 teleport agent (ssh_service) that dials the cluster's teleport proxy — no
 sshd, no ingress route. From a tailnet device: `tsh login --proxy
 teleport.internal`, then `tsh ssh bf@devil`. The node join token arrives as a
-mounted Secret (`/run/secrets/teleport-token`).
+mounted Secret (`/etc/teleport-secrets/teleport-token`).
 
 ## deferred
 
