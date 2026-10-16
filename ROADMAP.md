@@ -32,9 +32,9 @@ Then: factory reset → bootstrap per the README runbook (lix installer → xcod
 
 - [x] **Teleport-only access (decided)** — devil ships **no sshd at all**; the image runs a teleport agent (`ssh_service`) that dials the cluster's teleport proxy. Connecting = be on the tailnet, `tsh login --proxy teleport.internal`, `tsh ssh bf@devil`. No Service, no HTTPRoute — nothing dials in.
 - [x] **Join token** — minted (`tctl tokens add --type=node`), sops'd into infra as `devil-teleport-token` (Secret in the `devil` namespace), mounted at `/etc/teleport-secrets/teleport-token`; the agent's `--token` reads the file. The CA pin is baked into the agent config (`ca_pin`).
-- [ ] **State preservation** — model decided: the image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches). Open: PVC for `/home` + `/var/lib/teleport` so state and the teleport identity survive pod restarts; `/nix` stays ephemeral — a re-switch from the persisted clone converges.
+- [x] **State preservation** — model decided: the image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches). Open: PVC for `/home` + `/var/lib/teleport` so state and the teleport identity survive pod restarts; `/nix` stays ephemeral — a re-switch from the persisted clone converges.
 - [ ] **Make devil nicer** — shell/editor parity inside the pod (it already imports the full home config).
-- [ ] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
+- [x] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
 
 ## LATER — rice & iteration (post-reset)
 

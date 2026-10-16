@@ -14,7 +14,7 @@
     ];
 
     programs.git.settings = {
-      user.signingkey = "F804FDB7ACA417B06989F4303621C839358AA0E1";
+      user.signingkey = "84A27B4385BD9467D0FA55E70C88C11F14E660C6";
       commit.gpgsign = true;
       tag.gpgsign = true;
     };
