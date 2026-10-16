@@ -45,6 +45,11 @@ let
 
         security.sudo.wheelNeedsPassword = false;
 
+        # kubelet bind-mounts /etc/hostname and /etc/hosts into container —
+        # NixOS's etc activation cannot replace bind mounts and warns on every switch
+        environment.etc."hostname".enable = false;
+        environment.etc."hosts".enable = false;
+
         networking.useDHCP = false;
         networking.resolvconf.enable = false;
         networking.firewall.allowedTCPPorts = [ 3022 ];
