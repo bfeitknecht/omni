@@ -1,3 +1,3 @@
 creation_rules:
   - path_regex: secrets/.*\.sops\.ya?ml$
-    age: age170rmcek6zuhx4gd837elruddvhxha56ekqlkfu2ty6lpagxhsdrq6ra8ju,age1l4d7qzpg5tmtvwq3qw54arxhe3ptd3td3wephzf59wpsj58zcadq2fn282
+    age: age170rmcek6zuhx4gd837elruddvhxha56ekqlkfu2ty6lpagxhsdrq6ra8ju,age1l4d7qzpg5tmtvwq3qw54arxhe3ptd3td3wephzf59wpsj58zcadq2fn282,age1990uq7eht9kgf3munu6ym8jkltjeaj8ga50rq7mrcg9r77w723msq7wrnr

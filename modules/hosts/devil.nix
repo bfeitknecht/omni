@@ -39,6 +39,9 @@ let
         };
 
         programs.zsh.enable = true;
+        # zim's completion module owns compinit (shell.nix) — the NixOS
+        # /etc/zshrc must not run it first
+        programs.zsh.enableCompletion = false;
 
         security.sudo.wheelNeedsPassword = false;
 
