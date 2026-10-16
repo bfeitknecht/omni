@@ -36,6 +36,10 @@ let
           isNormalUser = true;
           extraGroups = [ "wheel" ];
           shell = pkgs.zsh;
+          # teleport sessions create no login session (no pam_systemd) —
+          # the user manager (and sops-nix's user service,
+          # which materializes the HM secrets) must start at boot instead
+          linger = true;
         };
 
         programs.zsh.enable = true;
