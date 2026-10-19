@@ -6,7 +6,8 @@
   # scope force itself during config eval (installer-tools / HM direnv
   # defaults) — infinite recursion. nixos-rebuild-ng is re-bound to the
   # system lix by the base installer-tools module anyway.
-  flake.overlays.lix = final: prev:
+  flake.overlays.lix =
+    final: prev:
     lib.genAttrs [
       "colmena"
       "nix-du"

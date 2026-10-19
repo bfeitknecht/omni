@@ -1,0 +1,16 @@
+{
+  "load_direnv": "direct",
+  "languages": {
+    "Nix": {
+      "language_servers": ["nil"],
+      "format_on_save": "on"
+    }
+  },
+  "lsp": {
+    "nil": {
+        "binary": {
+          "path": "/nix/store/vrs9wdsc5m6sx7xipwg23c13j11xx15m-nil-2026-07-23/bin/nil"
+        },
+    }
+  }
+}

@@ -12,7 +12,7 @@
       # into services. sops-nix owns these paths after activation. Declared
       # only once that file exists (and is tracked), so machines without
       # secrets yet keep switching.
-      sops.secrets = lib.mkIf (builtins.pathExists ../../secrets/secrets.sops.yaml) {
+      sops.secrets = {
         "ssh/github".path = "${config.home.homeDirectory}/.ssh/github";
         "ssh/github.pub".path = "${config.home.homeDirectory}/.ssh/github.pub";
         "ssh/forgejo".path = "${config.home.homeDirectory}/.ssh/forgejo";

@@ -5,9 +5,10 @@
         # nil links libnixexpr — take the lix-built one
         lixPackageSets.stable.nil
         nixfmt
+        nixfmt-tree
       ];
     };
 
-    formatter = pkgs.nixfmt;
+    formatter = pkgs.nixfmt-tree;
   };
 }

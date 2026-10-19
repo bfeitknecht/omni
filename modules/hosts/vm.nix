@@ -24,7 +24,10 @@ let
         nix.package = pkgs.lixPackageSets.stable.lix;
         # system-level: root/sudo nix (nh os switch) reads /etc/nix/nix.conf,
         # not the HM user config
-        nix.settings.experimental-features = [ "nix-command" "flakes" ];
+        nix.settings.experimental-features = [
+          "nix-command"
+          "flakes"
+        ];
 
         users.users.${config.flake.username} = {
           isNormalUser = true;
@@ -53,24 +56,29 @@ let
 
           # host store read-only + writable tmpfs overlay: the guest can
           # build and `nh os switch` against the shared store
-          shares = [ {
-            tag = "ro-store";
-            source = "/nix/store";
-            mountPoint = "/nix/.ro-store";
-          } ];
+          shares = [
+            {
+              tag = "ro-store";
+              source = "/nix/store";
+              mountPoint = "/nix/.ro-store";
+            }
+          ];
           writableStoreOverlay = "/nix/.rw-store";
 
           # user-mode networking (slirp); falls back to TCG without /dev/kvm
-          interfaces = [ {
-            type = "user";
-            id = "qemu";
-            mac = "02:00:00:4f:6d:6e";
-          } ];
+          interfaces = [
+            {
+              type = "user";
+              id = "qemu";
+              mac = "02:00:00:4f:6d:6e";
+            }
+          ];
         };
       })
     ];
   };
-in {
+in
+{
   flake.nixosConfigurations.vm = nixos;
   flake.packages.aarch64-linux.vm = nixos.config.microvm.declaredRunner;
 }

@@ -156,7 +156,7 @@
           show_banner = false;
           table.mode = "markdown";
         };
-        shellAliases.cat = "bat --paging=never";
+        shellAliases.cat = "bat --paging=auto";
         extraEnv = ''
           $env.STARSHIP_CONFIG = ($nu.default-config-dir | path dirname | path join "starship" "starship.toml")
         '';

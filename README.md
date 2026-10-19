@@ -123,19 +123,28 @@ am_or_rebase = "AM/REBASE"
 ```
 flake.nix                 inputs + mkFlake + import-tree, nothing else
 .sops.yaml                sops rules; encrypted files carry the .sops. pre-extension
-secrets/                  data, not a module — consumed only by modules/home/secrets.nix
+secrets/                  data, not a module — consumed only by features/home/secrets.nix
+.zed/settings.json        project settings: direnv-loaded devshell env (nil from the devshell), nixfmt on save
 modules/                  import-tree root; every .nix here is a flake-parts module
-├── omni.nix              username, systems
-├── lix.nix               flake.overlays.lix — binds the nix tool ecosystem to lixPackageSets.stable
-├── home/                 the home-manager class tree, exported as flake.homeModules.*
-│   ├── default.nix       aggregator: imports all classes, home.stateVersion lives here
-│   ├── shell.nix         zsh (zimfw), nushell (`use user *`), zoxide, direnv
-│   ├── tools.nix         rg fd bat eza bottom television uv + dust tlrc age sops lua deno
-│   ├── git.nix           git delta jujutsu tea gh
-│   ├── editor.nix        neovim (nvf), helix
-│   ├── nix.nix           nh comma nom any-nix-shell, nix.settings, lix as nix.package
-│   ├── gpg.nix           gpg identity (sops) + commit/tag signing
-│   └── secrets.nix       sops-nix HM module + age key location
+├── flake/                flake-specific config (flake outputs only)
+│   ├── parts.nix         systems
+│   ├── devshell.nix      devShells.default (lix-built nil + nixfmt), formatter
+│   ├── lix.nix           flake.overlays.lix — binds the nix tool ecosystem to lixPackageSets.stable
+│   └── standalone.nix    standalone homeConfigurations (bf@auto, bf@vm) — the class tree without an OS
+├── system/
+│   └── user.nix          user identity (flake.username) + the declared flake.homeModules option
+├── features/
+│   └── home/             the home-manager class tree, exported as flake.homeModules.*
+│       ├── default.nix   aggregator: imports all classes, home.stateVersion lives here
+│       ├── shell.nix     zsh (zimfw), nushell (`use user *`), zoxide, direnv
+│       ├── tools.nix     rg fd bat eza bottom television uv + dust tlrc age sops lua deno
+│       ├── git.nix       git delta jujutsu tea gh
+│       ├── editor.nix    neovim (nvf), helix
+│       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
+│       ├── gpg.nix       gpg identity (sops) + commit/tag signing
+│       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
+│       ├── ssh.nix       ssh keys (public in-tree, private via sops)
+│       └── secrets.nix   sops-nix HM module + age key location
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)
     ├── devil.nix         nixosConfigurations.devil + packages.devil (rootfs tarball)
