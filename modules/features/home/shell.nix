@@ -63,7 +63,7 @@
             custom.prompt = {
               description = "The left prompt (conditional)";
               format = "$output";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "TELEPORT_SESSION" ]]'';
               # user at host in directory
               command = ''printf '%s@%s:%s' "$USER" "$HOST" '' + "\"\${PWD/#$HOME/~}\""; # holy abomination
               shell = [
@@ -74,7 +74,7 @@
             custom.time = {
               format = "$output";
               description = "The current time (conditional)";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "TELEPORT_SESSION" ]]'';
               # date with ISO format string
               command = "date +'%Y-%m-%dT%H:%M:%S%z'";
               shell = [
