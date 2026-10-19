@@ -24,6 +24,11 @@ let
         time.timeZone = "Europe/Zurich";
         system.stateVersion = "26.11";
 
+        documentation = {
+          enable = true;
+          man.enable = true;
+        };
+
         # lix is the system nix (the nixpkgs default is upstream nix)
         nix.package = pkgs.lixPackageSets.stable.lix;
         # root/sudo nix (nh os switch) reads /etc/nix/nix.conf, not the HM user config
