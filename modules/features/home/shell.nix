@@ -230,11 +230,15 @@
       programs.atuin = {
         enable = true;
         enableZshIntegration = true;
+        settings = {
+          # enter pulls the selection into the buffer, it does not run it
+          enter_accept = false;
+          # sync_address = "https://atuin.0xbf.ch";
+          ai.enabled = true;
+        };
         enableNushellIntegration = true;
         # keep the up arrow as plain history navigation — ctrl-r is the picker
         flags = [ "--disable-up-arrow" ];
-        # enter pulls the selection into the buffer, it does not run it
-        settings.enter_accept = false;
         # atuin rewrites config.toml itself; let HM own the file
         forceOverwriteSettings = true;
       };
