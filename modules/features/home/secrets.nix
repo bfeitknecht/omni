@@ -4,6 +4,6 @@
 
     sops.age.keyFile = "${config.home.homeDirectory}/.config/sops/age/keys.txt";
 
-    sops.defaultSopsFile = ../../secrets/secrets.sops.yaml;
+    sops.defaultSopsFile = ../../../secrets/secrets.sops.yaml;
   };
 }
