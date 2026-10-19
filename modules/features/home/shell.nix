@@ -166,7 +166,7 @@
           $env.config.render_right_prompt_on_last_line = false
 
           $env.PROMPT_COMMAND = { ||
-            if ('TMUX' in $env or 'ZED_TERM' in $env) {
+            if ('TMUX' in $env or 'ZED_TERM' in $env or 'TELEPORT_SESSION' in $env) {
               ""
             } else {
               (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
