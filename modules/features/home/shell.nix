@@ -90,6 +90,7 @@
       programs.zsh = {
         enable = true;
         dotDir = "${config.xdg.configHome}/zsh";
+        defaultKeymap = "emacs";
         # zimfw's completion module owns compinit
         enableCompletion = false;
         history = {
@@ -234,7 +235,7 @@
           # enter pulls the selection into the buffer, it does not run it
           enter_accept = false;
           # sync_address = "https://atuin.0xbf.ch";
-          ai.enabled = true;
+          ai.enabled = false;
         };
         enableNushellIntegration = true;
         # keep the up arrow as plain history navigation — ctrl-r is the picker
