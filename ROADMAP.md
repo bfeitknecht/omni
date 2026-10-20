@@ -30,9 +30,10 @@ Then: factory reset → bootstrap per the README runbook (lix installer → xcod
 
 ## NEXT — devil (pairs with the infra deploy)
 
-- [x] **Teleport-only access (decided)** — devil ships **no sshd at all**; the image runs a teleport agent (`ssh_service`) that dials the cluster's teleport proxy. Connecting = be on the tailnet, `tsh login --proxy teleport.internal`, `tsh ssh bf@devil`. No Service, no HTTPRoute — nothing dials in.
+- [ ] **Keypair + login secret (owner, blocking)** — `ssh-keygen -t ed25519 -f devil -C devil`; add `ssh/devil` + `ssh/devil.pub` (ssh.nix declares both halves, like every other key) and `login/devil` (`mkpasswd -m yescrypt` of the ghostty-web login password) to `secrets/secrets.sops.yaml`. No paste step: sshd reads the pub half straight from the sops-materialized file (`AuthorizedKeysFile /run/secrets/ssh/devil.pub` — eval can't read sops, `authorizedKeys.keyFiles` is `listOf path` and forbids `/run` paths in pure eval). ⚠️ every `nh * switch` on every host fails until `ssh/devil` exists (HM sops activation); devil's additionally needs `login/devil`.
+- [x] ~~**Teleport-only access**~~ — **superseded 2026-10-20: ssh + ghostty-web**. devil ships sshd (port 2222, pubkey-only, password login blocked, host keys persisted at `/var/lib/ssh` on the PVC) and the ghostty-web terminal at `devil.internal` — ttyd in the VM serves the infra-side static page (ConfigMap at `/srv/ghostty-web`) and puts a real `login` prompt on the pty: PAM validates bf's password (`login/devil`, devil-only), the shell is the full home config. The internal-allowlist middleware is the only network gate; the router forwards nothing. The teleport agent stays in the image **until the friend demo**, then teardown (LATER). Infra side (gateway `devilssh` listener, headless Service, HTTPRoute + TCPRoute) lives in `applications/devil/` — the kata VM bypasses ClusterIP translation, hence the headless Service.
 - [x] **Join token** — minted (`tctl tokens add --type=node`), sops'd into infra as `devil-teleport-token` (Secret in the `devil` namespace), mounted at `/etc/teleport-secrets/teleport-token`; the agent's `--token` reads the file. The CA pin is baked into the agent config (`ca_pin`).
-- [x] **State preservation** — model decided: the image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches). Open: PVC for `/home` + `/var/lib/teleport` so state and the teleport identity survive pod restarts; `/nix` stays ephemeral — a re-switch from the persisted clone converges.
+- [x] **State preservation** — devil-pvc (infra, renamed from devil-state; subPaths `home`/`ssh`/`teleport`). The image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches); `/nix` stays ephemeral — a re-switch from the persisted clone converges. ⚠️ the PVC rename needs the volume-copy runbook on the infra side (prune deletes the old PVC) — `infra/.private/devil-pvc-rename.md`.
 - [ ] **Make devil nicer** — shell/editor parity inside the pod (it already imports the full home config).
 - [x] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
 
@@ -42,6 +43,7 @@ Then: factory reset → bootstrap per the README runbook (lix installer → xcod
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
 - [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same aarch64-linux platform, same home config) before touching the real pod.
+- [ ] **Teleport teardown** — after the friend demo: omni (agent unit, port 3022, the `TELEPORT_SESSION` prompt special-case in shell.nix) + infra (`infrastructure/teleport/`, the devil mounts/secret/configmap, `dependsOn`) + docs.
 
 ## SOMEDAY
 

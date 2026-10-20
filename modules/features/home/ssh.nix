@@ -19,6 +19,8 @@
         "ssh/forgejo.pub".path = "${config.home.homeDirectory}/.ssh/forgejo.pub";
         "ssh/tangled".path = "${config.home.homeDirectory}/.ssh/tangled";
         "ssh/tangled.pub".path = "${config.home.homeDirectory}/.ssh/tangled.pub";
+        "ssh/devil".path = "${config.home.homeDirectory}/.ssh/devil";
+        "ssh/devil.pub".path = "${config.home.homeDirectory}/.ssh/devil.pub";
       };
 
       # HM's built-in Host * defaults are deprecated; we declare everything
@@ -56,6 +58,12 @@
         settings."tangled.org" = {
           user = "git";
           identityFile = "~/.ssh/tangled";
+        };
+
+        settings."devil.internal" = {
+          user = config.home.username;
+          port = 2222;
+          identityFile = "~/.ssh/devil";
         };
       };
     };

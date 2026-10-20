@@ -207,11 +207,16 @@ docker push ghcr.io/bfeitknecht/devil:latest
 The image is only the bootstrap (the entrypoint lives in the infra tree's
 `applications/devil/deployment.yaml` as `command: ["/init"]`). Inside the
 booted pod: clone omni, `nh os switch .#devil` — day-to-day
-updates never touch the image. Access is teleport-only: the image runs a
-teleport agent (ssh_service) that dials the cluster's teleport proxy — no
-sshd, no ingress route. From a tailnet device: `tsh login --proxy
-teleport.internal`, then `tsh ssh bf@devil`. The node join token arrives as a
-mounted Secret (`/etc/teleport-secrets/teleport-token`).
+updates never touch the image. Access to devil.internal (LAN + tailnet only, the
+router forwards nothing): **ssh** — port 2222, pubkey-only (`ssh/devil` in
+sops; the private half rides to ish out-of-band); **ghostty-web** —
+https://devil.internal, ttyd in the VM serves the infra-side static page
+(ConfigMap) and puts a real `login` prompt on the pty — PAM validates bf's
+password (`login/devil`, devil-only), the internal-allowlist middleware is
+the only network gate; **teleport** — the agent stays in the image until the
+teardown after the friend demo (ROADMAP), `tsh ssh bf@devil` keeps working
+meanwhile. The join token arrives as a mounted Secret
+(`/etc/teleport-secrets/teleport-token`).
 
 ## deferred
 
