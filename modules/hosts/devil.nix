@@ -97,7 +97,9 @@ let
           defaultSopsFile = ../../secrets/secrets.sops.yaml;
           age.keyFile = "/home/${config.flake.username}/.config/sops/age/keys.txt";
           secrets."login/devil".neededForUsers = true;
-          secrets."ssh/devil.pub" = { }; # placeholder
+          # sshd reads authorized_keys as the target user (verified in-VM:
+          # root-owned 0400 → Permission denied, bf-owned 0400 → accepted)
+          secrets."ssh/devil.pub".owner = config.flake.username;
         };
       })
     ];
