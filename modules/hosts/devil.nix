@@ -32,10 +32,7 @@ let
         networking.useDHCP = false;
         networking.resolvconf.enable = false;
 
-        # sandbox off: inside the kata VM the build sandbox cannot resolve
-        # DNS (fixed-output fetchers like nix-index-database die with "could
-        # not resolve host" while the daemon's own fetches work) — the VM is
-        # the isolation boundary, so the sandbox buys nothing here
+        # inside kata VM build sandbox cannot resolve DNS
         nix.settings.sandbox = false;
         networking.firewall.allowedTCPPorts = [
           2222 # sshd — the devil.internal TCPRoute (gateway listener devilssh)
