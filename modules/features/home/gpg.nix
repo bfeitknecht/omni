@@ -1,5 +1,5 @@
 { ... }: {
-  flake.homeModules.gpg = { config, ... }: {
+  flake.modules.homeManager.gpg = { config, ... }: {
     programs.gpg.enable = true;
 
     sops.secrets."gpg/private" = {

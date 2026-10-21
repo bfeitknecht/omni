@@ -1,5 +1,5 @@
 {
-  flake.homeModules.ssh =
+  flake.modules.homeManager.ssh =
     {
       config,
       lib,

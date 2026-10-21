@@ -1,45 +1,18 @@
 { inputs, config, ... }:
 let
+  # the host's platform, declared once — see devil.nix
+  system = "aarch64-linux";
+
   # let-bound so the runner package below can reference the configuration
   # without reading config.flake.nixosConfigurations (freeform-merge recursion)
   nixos = inputs.nixpkgs.lib.nixosSystem {
     modules = [
-      { nixpkgs.hostPlatform = "aarch64-linux"; }
-      { nixpkgs.overlays = [ config.flake.overlays.lix ]; }
-      inputs.home-manager.nixosModules.home-manager
+      { nixpkgs.hostPlatform = system; }
+      # wrapped in its own module — see devil.nix
+      { imports = [ config.flake.modules.nixos.default ]; }
       inputs.microvm.nixosModules.microvm
       {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.users.${config.flake.username}.imports = [
-          config.flake.homeModules.default
-        ];
-      }
-      ({ pkgs, ... }: {
         networking.hostName = "vm";
-        time.timeZone = "Europe/Zurich";
-        system.stateVersion = "26.11";
-
-        # lix is the system nix (the nixpkgs default is upstream nix)
-        nix.package = pkgs.lixPackageSets.stable.lix;
-        # system-level: root/sudo nix (nh os switch) reads /etc/nix/nix.conf,
-        # not the HM user config
-        nix.settings.experimental-features = [
-          "nix-command"
-          "flakes"
-        ];
-
-        users.users.${config.flake.username} = {
-          isNormalUser = true;
-          extraGroups = [ "wheel" ];
-          shell = pkgs.zsh;
-        };
-
-        programs.zsh.enable = true;
-
-        # disposable test bed: no password mechanism until the secrets
-        # iteration wires one
-        security.sudo.wheelNeedsPassword = false;
 
         # console-only; the qemu serial console is the primary path
         services.getty.autologinUser = config.flake.username;
@@ -74,11 +47,11 @@ let
             }
           ];
         };
-      })
+      }
     ];
   };
 in
 {
   flake.nixosConfigurations.vm = nixos;
-  flake.packages.aarch64-linux.vm = nixos.config.microvm.declaredRunner;
+  flake.packages.${system}.vm = nixos.config.microvm.declaredRunner;
 }

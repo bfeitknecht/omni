@@ -1,5 +1,5 @@
 {
-  flake.homeModules.ghostty =
+  flake.modules.homeManager.ghostty =
     { lib, pkgs, ... }:
     lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
       programs.ghostty = {

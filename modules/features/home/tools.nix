@@ -1,5 +1,5 @@
 { ... }: {
-  flake.homeModules.tools = { pkgs, ... }: {
+  flake.modules.homeManager.tools = { pkgs, ... }: {
     programs.ripgrep.enable = true;
     programs.fd.enable = true;
     programs.bat.enable = true;
@@ -26,6 +26,8 @@
       age
       sops
       lua
+      proton-pass-cli
+      tailscale
     ];
   };
 }

@@ -1,5 +1,5 @@
 { inputs, ... }: {
-  flake.homeModules.nix =
+  flake.modules.homeManager.nix =
     {
       config,
       lib,

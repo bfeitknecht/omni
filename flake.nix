@@ -37,6 +37,11 @@
   outputs =
     inputs:
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = [ (inputs.import-tree ./modules) ];
+      imports = [
+        (inputs.import-tree ./modules)
+        # flake.modules.* option family (nixos/darwin/homeManager class trees)
+        # lives in flake-parts' extras — not loaded by default
+        inputs.flake-parts.flakeModules.modules
+      ];
     };
 }

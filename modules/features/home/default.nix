@@ -1,6 +1,6 @@
 { config, ... }: {
-  flake.homeModules.default = { ... }: {
-    imports = with config.flake.homeModules; [
+  flake.modules.homeManager.default = { ... }: {
+    imports = with config.flake.modules.homeManager; [
       shell
       tools
       git

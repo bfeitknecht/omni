@@ -1,36 +1,18 @@
-{ inputs, config, ... }: {
+{ inputs, config, ... }:
+let
+  system = "aarch64-darwin";
+in
+{
   flake.darwinConfigurations.auto = inputs.nix-darwin.lib.darwinSystem {
     modules = [
-      { nixpkgs.hostPlatform = "aarch64-darwin"; }
-      { nixpkgs.overlays = [ config.flake.overlays.lix ]; }
-      inputs.home-manager.darwinModules.home-manager
+      { nixpkgs.hostPlatform = system; }
+      { imports = [ config.flake.modules.darwin.default ]; }
       inputs.nix-homebrew.darwinModules.nix-homebrew
       {
-        home-manager.useGlobalPkgs = true;
-        home-manager.useUserPackages = true;
-        home-manager.users.${config.flake.username}.imports = [
-          config.flake.homeModules.default
-        ];
-      }
-      {
         networking.hostName = "auto";
-        system.primaryUser = config.flake.username;
-        users.users.${config.flake.username}.home = "/Users/${config.flake.username}";
-        system.stateVersion = 7;
 
-        # the lix installer owns the daemon and /etc/nix/nix.conf
-        nix.enable = false;
-
-        # zimfw's completion module owns compinit — the global one would
-        # populate _comps first (zim warning); promptInit stays out of the
-        # way until starship lands
-        programs.zsh = {
-          enableCompletion = false;
-          promptInit = "";
-        };
-
-        # nix-darwin installs and owns Homebrew itself; the homebrew block
-        # below manages only what the Brewfile lists
+        # nix-darwin installs and owns Homebrew itself;
+        # the homebrew block below manages only what the Brewfile lists
         nix-homebrew = {
           enable = true;
           user = config.flake.username;

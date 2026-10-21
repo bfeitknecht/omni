@@ -123,18 +123,20 @@ am_or_rebase = "AM/REBASE"
 ```
 flake.nix                 inputs + mkFlake + import-tree, nothing else
 .sops.yaml                sops rules; encrypted files carry the .sops. pre-extension
-secrets/                  data, not a module — consumed only by features/home/secrets.nix
+secrets/                  data, not a module — consumed by features/home/secrets.nix + hosts/devil.nix (system-side sops)
 .zed/settings.json        project settings: direnv-loaded devshell env (nil from the devshell), nixfmt on save
 modules/                  import-tree root; every .nix here is a flake-parts module
 ├── flake/                flake-specific config (flake outputs only)
 │   ├── parts.nix         systems
 │   ├── devshell.nix      devShells.default (lix-built nil + nixfmt), formatter
 │   ├── lix.nix           flake.overlays.lix — binds the nix tool ecosystem to lixPackageSets.stable
-│   └── standalone.nix    standalone homeConfigurations (bf@auto, bf@vm) — the class tree without an OS
-├── system/
-│   └── user.nix          user identity (flake.username) + the declared flake.homeModules option
+│   └── homes.nix         standalone homeConfigurations (bf@host) — derived from the OS hosts, for `nh home switch`
+├── system/               cross-host OS classes + identity
+│   ├── user.nix          user identity (flake.username)
+│   ├── linux.nix         flake.modules.nixos.default — the shared NixOS class (hm wiring, lix, zsh gotchas)
+│   └── darwin.nix        flake.modules.darwin.default — the shared darwin class
 ├── features/
-│   └── home/             the home-manager class tree, exported as flake.homeModules.*
+│   └── home/             the home-manager class tree, exported as flake.modules.homeManager.*
 │       ├── default.nix   aggregator: imports all classes, home.stateVersion lives here
 │       ├── shell.nix     zsh (zimfw), nushell (`use user *`), zoxide, direnv
 │       ├── tools.nix     rg fd bat eza bottom television uv + dust tlrc age sops lua deno
@@ -150,6 +152,8 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
     ├── devil.nix         nixosConfigurations.devil + packages.devil (rootfs tarball)
     └── auto.nix          darwinConfigurations.auto
 ```
+
+classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`; hosts compose a class with host facts (the platform string is declared once per host); `homes.nix` derives a standalone home per host, so `nh home switch` works on every machine.
 
 ## bootstrap
 
