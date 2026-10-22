@@ -234,7 +234,7 @@
         settings = {
           # enter pulls the selection into the buffer, it does not run it
           enter_accept = false;
-          # sync_address = "https://atuin.0xbf.ch";
+          sync_address = "https://atuin.0xbf.ch";
           ai.enabled = false;
         };
         enableNushellIntegration = true;
