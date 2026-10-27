@@ -217,10 +217,7 @@ sops; the private half rides to ish out-of-band); **ghostty-web** —
 https://devil.internal, ttyd in the VM serves the infra-side static page
 (ConfigMap) and puts a real `login` prompt on the pty — PAM validates bf's
 password (`login/devil`, devil-only), the internal-allowlist middleware is
-the only network gate; **teleport** — the agent stays in the image until the
-teardown after the friend demo (ROADMAP), `tsh ssh bf@devil` keeps working
-meanwhile. The join token arrives as a mounted Secret
-(`/etc/teleport-secrets/teleport-token`).
+the only network gate.
 
 ## deferred
 

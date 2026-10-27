@@ -31,12 +31,13 @@ let
 
         networking.useDHCP = false;
         networking.resolvconf.enable = false;
+        # cluster DNS: kresd + knotd resolver Service (infra/kubernetes/applications/dns/)
+        networking.nameservers = [ "10.96.0.53" ];
 
         # inside kata VM build sandbox cannot resolve DNS
         nix.settings.sandbox = false;
         networking.firewall.allowedTCPPorts = [
           2222 # sshd — the devil.internal TCPRoute (gateway listener devilssh)
-          3022 # teleport agent (stays until the teardown after the friend demo)
           7681 # ttyd — the devil.internal HTTPRoute (ghostty-web)
         ];
 
@@ -48,7 +49,7 @@ let
             PasswordAuthentication = false;
             KbdInteractiveAuthentication = false;
             PermitRootLogin = "no";
-            # authorized_keys come from sops
+            # authorized_keys come from sops, rendered at boot
             AuthorizedKeysFile = "/run/secrets/ssh/devil.pub";
           };
           hostKeys = [
@@ -74,20 +75,7 @@ let
           };
         };
 
-        systemd.services.teleport = {
-          description = "Teleport agent (ssh_service)";
-          wantedBy = [ "multi-user.target" ];
-          serviceConfig = {
-            ExecStart = "${pkgs.teleport}/bin/teleport start --config=/etc/teleport/teleport.yaml --token=/etc/teleport-secrets/teleport-token";
-            Restart = "on-failure";
-            RestartSec = "5s";
-          };
-        };
-
         users.users.${config.flake.username} = {
-          # teleport sessions create no login session (no pam_systemd) —
-          # user manager (and sops-nix's user service) must start at boot
-          linger = true;
           hashedPasswordFile = "/run/secrets-for-users/login/devil";
         };
         # declarative password
@@ -97,9 +85,9 @@ let
           defaultSopsFile = ../../secrets/secrets.sops.yaml;
           age.keyFile = "/home/${config.flake.username}/.config/sops/age/keys.txt";
           secrets."login/devil".neededForUsers = true;
-          # sshd reads authorized_keys as the target user (verified in-VM:
-          # root-owned 0400 → Permission denied, bf-owned 0400 → accepted)
-          secrets."ssh/devil.pub".owner = config.flake.username;
+          # sshd reads the pub half as the login user — 0444 beats any
+          # render owner (verified in-VM: root-owned 0444 → accepted)
+          secrets."ssh/devil.pub".mode = "0444";
         };
       })
     ];

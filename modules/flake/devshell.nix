@@ -6,6 +6,7 @@
         lixPackageSets.stable.nil
         nixfmt
         nixfmt-tree
+        nix-output-monitor
       ];
     };
 

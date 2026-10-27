@@ -63,7 +63,7 @@
             custom.prompt = {
               description = "The left prompt (conditional)";
               format = "$output";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "TELEPORT_SESSION" ]]'';
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
               # user at host in directory
               command = ''printf '%s@%s:%s' "$USER" "$HOST" '' + "\"\${PWD/#$HOME/~}\""; # holy abomination
               shell = [
@@ -74,7 +74,7 @@
             custom.time = {
               format = "$output";
               description = "The current time (conditional)";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "TELEPORT_SESSION" ]]'';
+              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" ]]'';
               # date with ISO format string
               command = "date +'%Y-%m-%dT%H:%M:%S%z'";
               shell = [
@@ -129,8 +129,12 @@
         '';
       };
 
-      # bat everywhere: as cat, as the man pager, as the general pager
+      # bat everywhere: as cat, as the man pager, as the general pager.
+      # MANROFFOPT=-c: groff emits overstrike instead of SGR — col strips
+      # overstrikes cleanly but eats the "\x1b[" of SGR sequences, which
+      # used to leak literal fragments (1m, 0m, 4m) into the pager input.
       home.sessionVariables = {
+        MANROFFOPT = "-c";
         MANPAGER = "sh -c 'col -bx | bat -l man -p'";
         PAGER = "bat";
       };
@@ -166,7 +170,7 @@
           $env.config.render_right_prompt_on_last_line = false
 
           $env.PROMPT_COMMAND = { ||
-            if ('TMUX' in $env or 'ZED_TERM' in $env or 'TELEPORT_SESSION' in $env) {
+            if ('TMUX' in $env or 'ZED_TERM' in $env) {
               ""
             } else {
               (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
