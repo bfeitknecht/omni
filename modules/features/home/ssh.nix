@@ -62,9 +62,10 @@
           identityFile = "~/.ssh/tangled";
         };
 
+        # gateway listener devilssh (2223) -> the VM's sshd on 2222
         settings."devil.internal" = {
           user = config.home.username;
-          port = 2222;
+          port = 2223;
           identityFile = "~/.ssh/devil";
         };
       };

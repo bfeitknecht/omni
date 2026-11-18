@@ -1,6 +1,6 @@
 # Roadmap
 
-Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the macbook (`auto`), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
+Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the MacBooks (`auto`, and `anti`, the new MacBook Pro), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
 
 ## Where things stand
 
@@ -24,7 +24,7 @@ Ordered; the factory reset happens only after all of these:
 
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
 - [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
-- [ ] **macOS defaults → nix-darwin** `system.defaults`: dock (autohide, show speed), finder (quittable), wallpaper, liquid-glass styling.
+- [x] **macOS defaults → nix-darwin** — `modules/system/macbook.nix` (2026-11-19): dock, finder (quittable), Stage Manager, screenshots, trackpad, clock, global text and window settings, Liquid Glass (`NSGlassDiffusionSetting`), read from `echo` with `defaults read`. Not declarable: wallpaper, dock app list, menu bar layout. Verify on the first `nh darwin switch`.
 - [ ] **Brewfile parity** — un-comment the casks actually in use (spotify, whatsapp, signal, orbstack, prusaslicer, stats, raycast, proton-*) so the reset restores app parity.
 - [ ] FileVault is enabled manually during the reset (not declarable via nix-darwin).
 
@@ -37,7 +37,7 @@ Then: factory reset → bootstrap per the README runbook (lix installer → xcod
 - [x] **Join token** — minted (`tctl tokens add --type=node`), sops'd into infra as `devil-teleport-token` (Secret in the `devil` namespace), mounted at `/etc/teleport-secrets/teleport-token`; the agent's `--token` reads the file. The CA pin is baked into the agent config (`ca_pin`). Removed 2026-10-24 with the teleport teardown.
 - [x] **State preservation** — devil-pvc (infra, renamed from devil-state; subPaths `home`/`ssh` — the `teleport` subPath went with the 2026-10-24 teardown). The image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches); `/nix` stays ephemeral — a re-switch from the persisted clone converges. ⚠️ the PVC rename needs the volume-copy runbook on the infra side (prune deletes the old PVC) — `infra/.private/devil-pvc-rename.md`.
 - [ ] **Make devil nicer** — shell/editor parity inside the pod (it already imports the full home config).
-- [ ] **Rex on devil** — Superlogical's Rex (shared terminals, sandboxes, operational history; beta, waitlist at superlogical.com) as the always-on way into the home server. Join the waitlist; once in, run its agent on devil, declared in nix if it ships a package.
+- [ ] **Rex on devil** — declared 2026-11-19: flake input `rex` (preview channel), home module `rex.nix` (client everywhere, `init.lua` lists devil as `ssh://devil.internal`), devil runs the personal server (`services.rex`, linger). Left: `nh os switch .#devil` in the pod, then **Add Remote Host** in Rex for Mac or `rex -S ssh://devil.internal ls`.
 - [ ] **opencode on devil → opencode web** — the opencode CLI on devil attaches to the server behind `opencode.internal` (shared sessions, Ollama, keys) instead of running its own. Infra side: the `agent-isolation` CNP only admits Traefik, so add an ingress rule from the `devil` namespace (pod-to-pod, no authentik in that path) or go through the route with a token.
 - [x] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
 

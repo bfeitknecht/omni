@@ -77,7 +77,13 @@ let
 
         users.users.${config.flake.username} = {
           hashedPasswordFile = "/run/secrets-for-users/login/devil";
+          # the personal Rex server keeps its sessions while bf is logged out
+          linger = true;
         };
+
+        # Rex personal server for bf (systemd user service); clients come in
+        # over ssh (ssh://devil.internal)
+        home-manager.users.${config.flake.username}.services.rex.enable = true;
         # declarative password
         users.mutableUsers = false;
 

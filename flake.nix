@@ -32,6 +32,11 @@
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Rex (Superlogical), prebuilt; stable has no release yet
+    rex = {
+      url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

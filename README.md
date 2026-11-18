@@ -212,7 +212,7 @@ The image is only the bootstrap (the entrypoint lives in the infra tree's
 `applications/devil/deployment.yaml` as `command: ["/init"]`). Inside the
 booted pod: clone omni, `nh os switch .#devil` — day-to-day
 updates never touch the image. Access to devil.internal (LAN + tailnet only, the
-router forwards nothing): **ssh** — port 2222, pubkey-only (`ssh/devil` in
+router forwards nothing): **ssh** — port 2223 (the VM's sshd listens on 2222), pubkey-only (`ssh/devil` in
 sops; the private half rides to ish out-of-band); **ghostty-web** —
 https://devil.internal, ttyd in the VM serves the infra-side static page
 (ConfigMap) and puts a real `login` prompt on the pty — PAM validates bf's

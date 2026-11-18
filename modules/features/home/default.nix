@@ -10,6 +10,7 @@
       ssh
       gpg
       secrets
+      rex
     ];
 
     home.stateVersion = "26.11";
