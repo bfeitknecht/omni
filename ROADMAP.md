@@ -1,6 +1,6 @@
 # Roadmap
 
-Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the MacBooks (`auto`, and `anti`, the new MacBook Pro), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
+Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
 
 ## Where things stand
 
@@ -24,7 +24,7 @@ Ordered; the factory reset happens only after all of these:
 
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
 - [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
-- [x] **macOS defaults → nix-darwin** — `modules/system/macbook.nix` (2026-11-19): dock, finder (quittable), Stage Manager, screenshots, trackpad, clock, global text and window settings, Liquid Glass (`NSGlassDiffusionSetting`), read from `echo` with `defaults read`. Not declarable: wallpaper, dock app list, menu bar layout. Verify on the first `nh darwin switch`.
+- [x] **macOS defaults → nix-darwin** — `modules/hosts/anti.nix` (2026-11-19): dock, finder (quittable), Stage Manager, screenshots, trackpad, clock, global text and window settings, Liquid Glass (`NSGlassDiffusionSetting`), read from `echo` with `defaults read`. Rundown of what else moves: `docs/MIGRATION.md`. Verify on the first `nh darwin switch`.
 - [ ] **Brewfile parity** — un-comment the casks actually in use (spotify, whatsapp, signal, orbstack, prusaslicer, stats, raycast, proton-*) so the reset restores app parity.
 - [ ] FileVault is enabled manually during the reset (not declarable via nix-darwin).
 

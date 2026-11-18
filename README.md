@@ -1,6 +1,6 @@
 # omni
 
-dendritic nix flake for three hosts: a microvm test bed, the macbook via nix-darwin (hostname `auto`), and devil — the nixos basis for the kata pod image on the talos cluster. flake-parts + import-tree, one flake, no shims. use home manager for as much as possible. microvm.nix for testing and developing. put as much as possible in XDG_CONFIG, i.e. i don't want zimfw to go in HOME somewhere but rather it should come from .config/zsh or something. the config generated for nushell from HM should `use` (or import or whatever) a dir .config/nushell/user/ so that i can add custom configuration dynamically at runtime without reswitching HM.
+dendritic nix flake for three hosts: a microvm test bed, the macbook via nix-darwin (hostname `anti`), and devil — the nixos basis for the kata pod image on the talos cluster. flake-parts + import-tree, one flake, no shims. use home manager for as much as possible. microvm.nix for testing and developing. put as much as possible in XDG_CONFIG, i.e. i don't want zimfw to go in HOME somewhere but rather it should come from .config/zsh or something. the config generated for nushell from HM should `use` (or import or whatever) a dir .config/nushell/user/ so that i can add custom configuration dynamically at runtime without reswitching HM.
 
 - openvpn (?)
 - tailscale (?)
@@ -150,14 +150,14 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)
     ├── devil.nix         nixosConfigurations.devil + packages.devil (rootfs tarball)
-    └── auto.nix          darwinConfigurations.auto
+    └── anti.nix          darwinConfigurations.anti
 ```
 
 classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`; hosts compose a class with host facts (the platform string is declared once per host); `homes.nix` derives a standalone home per host, so `nh home switch` works on every machine.
 
 ## bootstrap
 
-### macbook (`auto`)
+### macbook (`anti`)
 
 ```nu
 # 1. lix owns the daemon — nix-darwin runs with nix.enable = false
@@ -171,7 +171,7 @@ git clone https://github.com/bfeitknecht/omni.git ~/.config/omni
 cd ~/.config/omni
 
 # 4. first switch (nh comes with the config itself)
-sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#auto
+sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#anti
 
 # 5. secrets — age key + encrypted store, then switch again
 #    (full runbook: secrets/README.md)

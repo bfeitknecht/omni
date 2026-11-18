@@ -1,6 +1,6 @@
 { inputs, config, ... }: {
   # the shared darwin class — the hm plumbing + shell gotchas the darwin
-  # host (auto) shares with the nixos class (system/linux.nix)
+  # host (anti) shares with the nixos class (system/linux.nix)
   flake.modules.darwin.default = { ... }: {
     imports = [ inputs.home-manager.darwinModules.home-manager ];
 
