@@ -2,10 +2,15 @@
 
 What moves from the old MacBook Pro (`echo`, Mac14,9, macOS 27.0.1) to the new
 one (`anti`). Read from echo on 2026-11-19 (`defaults read`, `brew`, `mas`,
-`/Applications`, `~/.config`). Ordered by effort: declared already, then easy
-to declare, then manual.
+`/Applications`, `~/.config`). Nothing here is applied: `anti` is the old `auto`
+config. Pick what you want from each section.
 
-## 1. Declared in `modules/hosts/anti.nix`
+## 1. macOS settings on echo (pick what you want)
+
+None of this is in `anti.nix`. `anti` is the old `auto` config only.
+The table is what echo has; the block below is ready to paste into
+`anti.nix` (inside the module, next to `homebrew`). Delete the lines you
+don't want.
 
 | Area           | Setting                                                                                           |
 | -------------- | ------------------------------------------------------------------------------------------------- |
@@ -21,11 +26,119 @@ to declare, then manual.
 | Glass          | `NSGlassDiffusionSetting = 1`, desktop tinting off, blurred menu bar. **Check after the first switch**: the key is right, the value is not verified against the slider. |
 | Menu bar       | `AutoHideMenuBarOption = 3`, visible in full screen                                              |
 
+```nix
+system.defaults = {
+  dock = {
+    autohide = true;
+    autohide-delay = 0.0;
+    autohide-time-modifier = 0.15;
+    orientation = "left";
+    tilesize = 42;
+    magnification = false;
+    mineffect = "genie";
+    minimize-to-application = false;
+    show-recents = false;
+    show-process-indicators = true;
+    # hot corners: top right Quick Note, bottom right app windows
+    wvous-tr-corner = 14;
+    wvous-br-corner = 3;
+  };
+
+  finder = {
+    QuitMenuItem = true;
+    ShowPathbar = true;
+    ShowStatusBar = false;
+    FXPreferredViewStyle = "Nlsv"; # list view
+    FXDefaultSearchScope = "SCcf"; # search the current folder
+    FXEnableExtensionChangeWarning = false;
+    NewWindowTarget = "Home";
+    ShowExternalHardDrivesOnDesktop = true;
+    ShowHardDrivesOnDesktop = false;
+    ShowRemovableMediaOnDesktop = true;
+    ShowMountedServersOnDesktop = true;
+  };
+
+  WindowManager = {
+    GloballyEnabled = false; # Stage Manager off
+    AutoHide = true;
+    HideDesktop = true;
+    EnableTiledWindowMargins = false;
+    EnableTopTilingByEdgeDrag = false;
+    StageManagerHideWidgets = false;
+    StandardHideWidgets = false;
+  };
+
+  screencapture = {
+    target = "clipboard";
+    disable-shadow = true;
+    include-date = true;
+    show-thumbnail = false;
+    location = "~/Pictures/Screenshots";
+  };
+
+  trackpad = {
+    Clicking = true; # tap to click
+    TrackpadRightClick = true;
+    TrackpadThreeFingerDrag = false;
+    Dragging = false;
+    ActuateDetents = true;
+    FirstClickThreshold = 1;
+    SecondClickThreshold = 1;
+  };
+
+  menuExtraClock = {
+    ShowAMPM = true;
+    ShowDate = 1;
+    ShowDayOfWeek = true;
+    ShowSeconds = true;
+    IsAnalog = false;
+  };
+
+  NSGlobalDomain = {
+    AppleInterfaceStyle = "Dark";
+    AppleShowAllExtensions = true;
+    AppleKeyboardUIMode = 0;
+    AppleWindowTabbingMode = "always";
+    AppleSpacesSwitchOnActivate = true;
+    AppleEnableSwipeNavigateWithScrolls = true;
+    NSAutomaticCapitalizationEnabled = false;
+    NSAutomaticSpellingCorrectionEnabled = false;
+    NSAutomaticPeriodSubstitutionEnabled = false;
+    NSAutomaticInlinePredictionEnabled = false;
+    NSAutomaticWindowAnimationsEnabled = false;
+    NSTableViewDefaultSizeMode = 2;
+    _HIHideMenuBar = false;
+    "com.apple.swipescrolldirection" = true;
+    "com.apple.trackpad.scaling" = 1.0;
+    "com.apple.sound.beep.feedback" = 1;
+  };
+
+  # keys nix-darwin has no typed option for
+  CustomUserPreferences = {
+    NSGlobalDomain = {
+      AppleMenuBarVisibleInFullscreen = true;
+      # Liquid Glass (macOS 26+): the Appearance slider
+      NSGlassDiffusionSetting = 1;
+      AppleReduceDesktopTinting = true;
+      SLSMenuBarUseBlurredAppearance = true;
+      NSCloseAlwaysConfirmsChanges = true;
+      NSQuitAlwaysKeepsWindows = true;
+      AppleActionOnDoubleClick = "None";
+    };
+    "com.apple.WindowManager".AppWindowGroupingBehavior = 1;
+    "com.apple.controlcenter".AutoHideMenuBarOption = 3;
+  };
+};
+```
+
+Keys under `CustomUserPreferences` have no typed nix-darwin option. A typo
+there fails silently; the typed ones fail the eval.
+
 ## 2. Easy to declare (not done yet)
 
 ### Homebrew casks (`homebrew.casks` in `anti.nix`)
 
-In use on echo. Un-comment or add the ones you want:
+`anti` has zed and ghostty active and a commented list. In use on echo:
 
 anki, audacity, autodesk-fusion, balenaetcher, blender, bruno, claude-code,
 discord, element, firefox, handy, iterm2, karabiner-elements, kathara,

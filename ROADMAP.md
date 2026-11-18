@@ -24,7 +24,7 @@ Ordered; the factory reset happens only after all of these:
 
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
 - [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
-- [x] **macOS defaults → nix-darwin** — `modules/hosts/anti.nix` (2026-11-19): dock, finder (quittable), Stage Manager, screenshots, trackpad, clock, global text and window settings, Liquid Glass (`NSGlassDiffusionSetting`), read from `echo` with `defaults read`. Rundown of what else moves: `docs/MIGRATION.md`. Verify on the first `nh darwin switch`.
+- [ ] **macOS defaults → nix-darwin** — echo's settings are read out (2026-11-19) into `docs/MIGRATION.md` with a ready block. Pick, paste into `anti.nix`, verify on the first `nh darwin switch`.
 - [ ] **Brewfile parity** — un-comment the casks actually in use (spotify, whatsapp, signal, orbstack, prusaslicer, stats, raycast, proton-*) so the reset restores app parity.
 - [ ] FileVault is enabled manually during the reset (not declarable via nix-darwin).
 
