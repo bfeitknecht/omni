@@ -50,10 +50,10 @@
           identityFile = "~/.ssh/github";
         };
 
-        # Forgejo SSH listens on 2223 (Traefik gitssh); 22 is the apex TUI.
+        # Forgejo SSH on the clean 22 (Traefik gitssh, infra v1.42.0). The
+        # SSH TUIs (apex, browsh) ride the mux on 2222.
         settings."git.0xbf.ch" = {
           user = "git";
-          port = 2223;
           identityFile = "~/.ssh/forgejo";
         };
 
