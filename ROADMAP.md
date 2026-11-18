@@ -20,6 +20,8 @@ Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the m
 
 Ordered; the factory reset happens only after all of these:
 
+- [ ] **Reset runbook** — write it before doing it: what leaves the Mac (age key, ssh keys, browser profiles, app data that is not in nix), the order of the day, what omni restores (`nix-darwin` + home), what stays manual (FileVault, App Store, logins), a time budget, and a rollback (Time Machine to `smb://10.10.20.145` first). Then make the move.
+
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
 - [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
 - [ ] **macOS defaults → nix-darwin** `system.defaults`: dock (autohide, show speed), finder (quittable), wallpaper, liquid-glass styling.
@@ -35,6 +37,8 @@ Then: factory reset → bootstrap per the README runbook (lix installer → xcod
 - [x] **Join token** — minted (`tctl tokens add --type=node`), sops'd into infra as `devil-teleport-token` (Secret in the `devil` namespace), mounted at `/etc/teleport-secrets/teleport-token`; the agent's `--token` reads the file. The CA pin is baked into the agent config (`ca_pin`). Removed 2026-10-24 with the teleport teardown.
 - [x] **State preservation** — devil-pvc (infra, renamed from devil-state; subPaths `home`/`ssh` — the `teleport` subPath went with the 2026-10-24 teardown). The image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches); `/nix` stays ephemeral — a re-switch from the persisted clone converges. ⚠️ the PVC rename needs the volume-copy runbook on the infra side (prune deletes the old PVC) — `infra/.private/devil-pvc-rename.md`.
 - [ ] **Make devil nicer** — shell/editor parity inside the pod (it already imports the full home config).
+- [ ] **Rex on devil** — Superlogical's Rex (shared terminals, sandboxes, operational history; beta, waitlist at superlogical.com) as the always-on way into the home server. Join the waitlist; once in, run its agent on devil, declared in nix if it ships a package.
+- [ ] **opencode on devil → opencode web** — the opencode CLI on devil attaches to the server behind `opencode.internal` (shared sessions, Ollama, keys) instead of running its own. Infra side: the `agent-isolation` CNP only admits Traefik, so add an ingress rule from the `devil` namespace (pod-to-pod, no authentik in that path) or go through the route with a token.
 - [x] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
 
 ## LATER — rice & iteration (post-reset)
