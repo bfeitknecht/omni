@@ -1,5 +1,5 @@
 { inputs, ... }: {
-  # Rex (Superlogical): persistent terminal sessions. devil runs the server
+  # Rex (Superlogical): persistent terminal sessions, plus `oc` (opencode). devil runs the server
   # (hosts/devil.nix turns on services.rex); every other host is a client
   # and reaches devil over ssh, with the devil.internal entry in ssh.nix.
   flake.modules.homeManager.rex =
@@ -11,6 +11,16 @@
     }:
     {
       imports = [ inputs.rex.homeManagerModules.default ];
+
+      # `oc` on the Macs: the opencode TUI attached to the cluster server,
+      # through devil (only devil may reach it; the session runs in the
+      # isolated opencode VM, so closing the laptop stops nothing). devil has
+      # its own `oc` (hosts/devil.nix).
+      home.packages = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
+        (pkgs.writeShellScriptBin "oc" ''
+          exec ssh -t devil.internal oc "$@"
+        '')
+      ];
 
       programs.rex = {
         enable = true;
