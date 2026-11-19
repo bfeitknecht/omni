@@ -81,6 +81,10 @@ let
           linger = true;
         };
 
+        # Prebuilt Linux binaries (the opencode npm package ships one) expect
+        # the standard glibc loader; nix-ld provides it.
+        programs.nix-ld.enable = true;
+
         home-manager.users.${config.flake.username} = {
           # Rex personal server for bf (systemd user service); clients come
           # in over ssh (ssh://devil.internal)
@@ -97,10 +101,12 @@ let
             in
             [
               (pkgs.writeShellScriptBin "opencode" ''
-                exec ${pkgs.nodejs_22}/bin/npx -y opencode-ai@${version} "$@"
+                export PATH=${pkgs.nodejs_22}/bin:$PATH
+                exec npx -y opencode-ai@${version} "$@"
               '')
               (pkgs.writeShellScriptBin "oc" ''
-                exec ${pkgs.nodejs_22}/bin/npx -y opencode-ai@${version} attach http://opencode.opencode.svc "$@"
+                export PATH=${pkgs.nodejs_22}/bin:$PATH
+                exec npx -y opencode-ai@${version} attach http://opencode.opencode.svc "$@"
               '')
             ];
         };
