@@ -145,7 +145,8 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
 │       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
-│       ├── ssh.nix       ssh keys (public in-tree, private via sops)
+│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil :2223)
+│       ├── rex.nix       Rex client everywhere; init.lua lists devil (the server runs on devil)
 │       └── secrets.nix   sops-nix HM module + age key location
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)
@@ -158,6 +159,8 @@ classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`
 ## bootstrap
 
 ### macbook (`anti`)
+
+Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (macOS settings, casks, fonts, configs, data). Time Machine of echo first (infra `docs/LIVE.md` step 0).
 
 ```nu
 # 1. lix owns the daemon — nix-darwin runs with nix.enable = false

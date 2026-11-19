@@ -1,14 +1,15 @@
 # Roadmap
 
-Status as of 2026-10-14. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
+Status as of 2026-11-19. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
 
 ## Where things stand
 
 - Flake shape is settled: flake-parts + import-tree, lix overlay binding the nix tool ecosystem, home-manager as the config carrier, sops-nix for secrets. Classes live in `modules/system/{linux,darwin}.nix` (`flake.modules.{nixos,darwin}.default`); hosts compose class + host facts; standalone homes derive from the hosts (`nh home switch` on every host).
 - Home modules landed: shell (zsh/zimfw + nushell `use user *`), tools, git (delta/jujutsu/tea/gh), editor (nvf + helix), nix tooling (nh/comma/nom/any-nix-shell), gpg identity (sops), sops secrets class.
 - Starship prompt landed for both shells (polish ongoing); atuin and pay-respects wired into the shell; git identity, ssh keys + new SOPS recipient in.
-- Hosts: `auto` (darwin — nix-homebrew owns brew, zed + ghostty casks active, the rest of the cask list still commented out), `devil` (NixOS docker-container tarball → kata pod image, aarch64), `vm` (microvm test bed, console autologin, shared host store + writable overlay).
-- The macbook is still the pre-nix daily driver; the factory reset is gated on the parity work below.
+- Hosts: `anti` (darwin, the new MacBook Pro; was `auto` — nix-homebrew owns brew, zed + ghostty casks active, the rest of the cask list still commented out), `devil` (NixOS docker-container tarball → kata pod image, aarch64), `vm` (microvm test bed, console autologin, shared host store + writable overlay).
+- The old MacBook (`echo`) is still the pre-nix daily driver; the move to `anti` is gated on the parity work below. What can move: `docs/MIGRATION.md`.
+- Rex: client on every host (`rex.nix`), personal server on devil.
 - TODO residue already done: gpg identity (`gpg.nix`), starship, ssh keys — prunable from `.private/TODO.md`.
 
 ## The two gates
