@@ -81,9 +81,29 @@ let
           linger = true;
         };
 
-        # Rex personal server for bf (systemd user service); clients come in
-        # over ssh (ssh://devil.internal)
-        home-manager.users.${config.flake.username}.services.rex.enable = true;
+        home-manager.users.${config.flake.username} = {
+          # Rex personal server for bf (systemd user service); clients come
+          # in over ssh (ssh://devil.internal)
+          services.rex.enable = true;
+
+          # opencode client for the isolated server in the cluster (infra
+          # applications/opencode, Kata VM). The version must match the
+          # server pin in infra opencode.yaml: bump both together. `oc`
+          # attaches to the server; the session runs in the server VM, devil
+          # is only the screen.
+          home.packages =
+            let
+              version = "1.19.5";
+            in
+            [
+              (pkgs.writeShellScriptBin "opencode" ''
+                exec ${pkgs.nodejs_22}/bin/npx -y opencode-ai@${version} "$@"
+              '')
+              (pkgs.writeShellScriptBin "oc" ''
+                exec ${pkgs.nodejs_22}/bin/npx -y opencode-ai@${version} attach http://opencode.opencode.svc "$@"
+              '')
+            ];
+        };
         # declarative password
         users.mutableUsers = false;
 
