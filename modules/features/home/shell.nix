@@ -63,7 +63,7 @@
             custom.prompt = {
               description = "The left prompt (conditional)";
               format = "$output";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "$REX_SESSION" ]]'';
+              when = ''[[ -z "$ZED_TERM" && -z "$REX_SESSION" ]]'';
               # user at host in directory
               command = ''printf '%s@%s:%s' "$USER" "$HOST" '' + "\"\${PWD/#$HOME/~}\""; # holy abomination
               shell = [
@@ -74,7 +74,7 @@
             custom.time = {
               format = "$output";
               description = "The current time (conditional)";
-              when = ''[[ -z "$TMUX" && -z "$ZED_TERM" && -z "$REX_SESSION" ]]'';
+              when = ''[[ -z "$ZED_TERM" && -z "$REX_SESSION" ]]'';
               # date with ISO format string
               command = "date +'%Y-%m-%dT%H:%M:%S%z'";
               shell = [
@@ -170,8 +170,8 @@
           $env.config.render_right_prompt_on_last_line = false
 
           $env.PROMPT_COMMAND = { ||
-            # compact in tmux, Zed and Rex (REX_SESSION is set in every Rex block)
-            if ('TMUX' in $env or 'ZED_TERM' in $env or 'REX_SESSION' in $env) {
+            # compact in Zed and Rex (REX_SESSION is set in every Rex block)
+            if ('ZED_TERM' in $env or 'REX_SESSION' in $env) {
               ""
             } else {
               (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
