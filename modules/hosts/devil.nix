@@ -70,9 +70,19 @@ let
         programs.nix-ld.enable = true;
 
         home-manager.users.${config.flake.username} = {
-          # Rex personal server for bf (systemd user service); clients come
-          # in over ssh (ssh://devil.internal)
-          services.rex.enable = true;
+          # Rex personal server for bf (systemd user service). Clients come in
+          # over ssh (ssh://devil.internal) or over the tailnet: Rex runs its
+          # own Tailscale node `devil` (https://devil.<tailnet>.ts.net), owned
+          # by bf's account, so only bf's devices get in. First start: open
+          # the sign-in link from `rex server status`. The identity stays in
+          # ~/.local/state/rex on the PVC. ("rex" on the tailnet is the Mac app.)
+          services.rex = {
+            enable = true;
+            tailscale = {
+              enable = true;
+              hostname = "devil";
+            };
+          };
 
           # opencode client for the isolated server in the cluster (infra
           # applications/opencode, Kata VM). The version must match the
