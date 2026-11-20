@@ -38,14 +38,13 @@ let
         nix.settings.sandbox = false;
         networking.firewall.allowedTCPPorts = [
           2222 # sshd — the devil.internal TCPRoute (gateway listener devilssh)
-          7681 # ttyd — the devil.internal HTTPRoute (ghostty-web)
         ];
 
         services.openssh = {
           enable = true;
           ports = [ 2222 ];
           settings = {
-            # keys only — the login password exists for the ghostty-web pty
+            # keys only — the login password is for sudo and the console
             PasswordAuthentication = false;
             KbdInteractiveAuthentication = false;
             PermitRootLogin = "no";
@@ -58,21 +57,6 @@ let
               type = "ed25519";
             }
           ];
-        };
-
-        # ttyd serves the ghostty-web page (infra ConfigMap mounted at /srv/ghostty-web)
-        # and puts real `login` prompt on the pty —
-        # PAM validates bf's password, shell is full home config.
-        # internal-allowlist middleware is network gate, login prompt is auth.
-        systemd.services.ghostty-web = {
-          description = "ghostty-web terminal (devil.internal, ttyd + login)";
-          wantedBy = [ "multi-user.target" ];
-          after = [ "network.target" ];
-          serviceConfig = {
-            ExecStart = "${pkgs.ttyd}/bin/ttyd -W -O -p 7681 -I /srv/ghostty-web/index.html ${pkgs.util-linux}/bin/login";
-            Restart = "on-failure";
-            RestartSec = "5s";
-          };
         };
 
         users.users.${config.flake.username} = {

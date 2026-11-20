@@ -216,11 +216,9 @@ The image is only the bootstrap (the entrypoint lives in the infra tree's
 booted pod: clone omni, `nh os switch .#devil` — day-to-day
 updates never touch the image. Access to devil.internal (LAN + tailnet only, the
 router forwards nothing): **ssh** — port 2223 (the VM's sshd listens on 2222), pubkey-only (`ssh/devil` in
-sops; the private half rides to ish out-of-band); **ghostty-web** —
-https://devil.internal, ttyd in the VM serves the infra-side static page
-(ConfigMap) and puts a real `login` prompt on the pty — PAM validates bf's
-password (`login/devil`, devil-only), the internal-allowlist middleware is
-the only network gate.
+sops; the private half rides to ish out-of-band) and **Rex** (sessions on the
+VM's personal Rex server, reached over that ssh). No browser terminal: the
+ghostty-web page was removed 2026-11-20.
 
 ## deferred
 
