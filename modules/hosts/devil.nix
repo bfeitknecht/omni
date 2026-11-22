@@ -84,6 +84,10 @@ let
             };
           };
 
+          # the genesis repos live in ~/Projects on devil (moved from ~/src,
+          # ~/.config/omni is a symlink into it); nh switches this flake bare
+          programs.nh.flake = "/home/${config.flake.username}/Projects/omni";
+
           # opencode client for the isolated server in the cluster (infra
           # applications/opencode, Kata VM). The version must match the
           # server pin in infra opencode.yaml: bump both together. v2 clients
