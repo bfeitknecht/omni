@@ -86,21 +86,24 @@ let
 
           # opencode client for the isolated server in the cluster (infra
           # applications/opencode, Kata VM). The version must match the
-          # server pin in infra opencode.yaml: bump both together. `oc`
-          # attaches to the server; the session runs in the server VM, devil
-          # is only the screen.
+          # server pin in infra opencode.yaml: bump both together. v2 clients
+          # connect with --server (v1 `attach` is gone); the session runs in
+          # the server VM, devil is only the screen. The v2 server always
+          # requires a password: OPENCODE_PASSWORD comes from sops, the same
+          # value as infra opencode-secrets key server-password.
           home.packages =
             let
-              version = "1.19.5";
+              version = "2.3.2";
             in
             [
               (pkgs.writeShellScriptBin "opencode" ''
                 export PATH=${pkgs.nodejs_22}/bin:$PATH
-                exec npx -y opencode-ai@${version} "$@"
+                exec npx -y @opencode/cli@${version} "$@"
               '')
               (pkgs.writeShellScriptBin "oc" ''
+                export OPENCODE_PASSWORD="$(cat /run/secrets/opencode/server-password)"
                 export PATH=${pkgs.nodejs_22}/bin:$PATH
-                exec npx -y opencode-ai@${version} attach http://opencode.opencode.svc "$@"
+                exec npx -y @opencode/cli@${version} --server http://opencode.opencode.svc "$@"
               '')
             ];
         };
@@ -114,6 +117,12 @@ let
           # sshd reads the pub half as the login user — 0444 beats any
           # render owner (verified in-VM: root-owned 0444 → accepted)
           secrets."ssh/devil.pub".mode = "0444";
+          # opencode server password (same value as infra opencode-secrets
+          # server-password); the `oc` wrapper reads it at runtime
+          secrets."opencode/server-password" = {
+            mode = "0400";
+            owner = config.flake.username;
+          };
         };
       })
     ];
