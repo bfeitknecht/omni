@@ -20,6 +20,14 @@ let
         # flake-only image: no bundled nixpkgs channel
         system.installer.channel.enable = false;
 
+        # The docker-container profile's registration unit hangs: lix's
+        # nix-store --load-db waits in an epoll loop with no fds registered
+        # in this container. It blocks the systemd job queue, so sshd
+        # sessions and every later unit queue forever (the "devil freezes"
+        # of 2026-11-22/23, on both nodes). The boot command already
+        # registers the image store paths, so drop the unit.
+        systemd.units."register-nix-paths.service".enable = false;
+
         networking.hostName = "devil";
 
         documentation = {
