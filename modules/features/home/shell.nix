@@ -66,7 +66,7 @@
               # ${behind_count} exist in diverged alone (behind showed a bare <)
               ahead = ">" + count;
               behind = "<" + count;
-              diverged = "><" + ahead + "/" + behind;
+              diverged = ">" + ahead + "<" + behind;
               untracked = "%" + count;
               # a literal $ must be escaped (\$) in a starship format string;
               # "$${count}" failed to parse and hid the stash count

@@ -33,7 +33,7 @@ GIT
 up_to_date = "="
 ahead = ">${count}"
 behind = "<${count}"
-diverged = "><${ahead_count}/${behind_count}"
+diverged = ">${ahead_count}<${behind_count}"
 untracked = "%${count}"
 stashed = "\\$${count}"
 conflicted = "!${count}"
