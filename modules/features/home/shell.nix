@@ -43,19 +43,34 @@
               threshold = 1;
             };
             status = {
+              # off by default in starship: without this [ERR] never shows
+              disabled = false;
               format = ''\[$status\]($style)'';
               style = "bold red";
             };
             git_branch.format = "$branch";
-            git_state.format = "$state( $progress_current/$progress_total) ";
+            git_state = {
+              format = "$state( $progress_current/$progress_total)";
+              rebase = "REBASE";
+              merge = "MERGE";
+              revert = "REVERT";
+              cherry_pick = "CHERRY";
+              bisect = "BISECT";
+              am = "AM";
+              am_or_rebase = "AM/REBASE";
+            };
             git_status = {
               format = "( $all_status)( $ahead_behind)";
               up_to_date = "=";
+              # ahead and behind know only ${count}; ${ahead_count} and
+              # ${behind_count} exist in diverged alone (behind showed a bare <)
               ahead = ">" + count;
-              behind = "<" + behind;
-              diverged = ">" + ahead + "<" + behind;
+              behind = "<" + count;
+              diverged = "><" + ahead + "/" + behind;
               untracked = "%" + count;
-              stashed = "$" + count;
+              # a literal $ must be escaped (\$) in a starship format string;
+              # "$${count}" failed to parse and hid the stash count
+              stashed = "\\$" + count;
               conflicted = "!" + count;
               modified = "*" + count;
               staged = "+" + count;

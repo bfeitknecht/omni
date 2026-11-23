@@ -20,7 +20,7 @@ $USER@$HOSTNAME:$PWD        #(x$SHLVL) [ERR] GIT NOW
 SYM
 ```
 
-tmux or zed
+Zed or Rex (compact)
 
 ```
 SYM     #(x$SHLVL) [ERR] GIT
@@ -35,7 +35,7 @@ ahead = ">${count}"
 behind = "<${count}"
 diverged = "><${ahead_count}/${behind_count}"
 untracked = "%${count}"
-stashed = "$${count}"
+stashed = "\\$${count}"
 conflicted = "!${count}"
 modified = "*${count}"
 staged = "+${count}"
