@@ -97,7 +97,7 @@ let
           # value as infra opencode-secrets key server-password.
           home.packages =
             let
-              version = "2.3.2";
+              version = "2.4.0";
             in
             [
               (pkgs.writeShellScriptBin "opencode" ''

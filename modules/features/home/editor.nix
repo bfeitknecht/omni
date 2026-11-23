@@ -1,6 +1,7 @@
 { inputs, ... }: {
   flake.modules.homeManager.editor = {
-    imports = [ inputs.nvf.homeManagerModules.default ];
+    # nvf renamed homeManagerModules to homeModules (2026-11 lock bump warning)
+    imports = [ inputs.nvf.homeModules.default ];
 
     programs.nvf = {
       enable = true;
