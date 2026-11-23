@@ -1,6 +1,9 @@
 { inputs, config, ... }:
 let
-  system = "aarch64-linux";
+  # x86_64-linux since 2026-11-23: devil moved to rzbl (amd64 Blade). Kata
+  # VMs on rbpi (arm64 Pi) wedged within minutes and left orphan qemus that
+  # poisoned the node; amd64 KVM on rzbl is stable (opencode Kata runs there).
+  system = "x86_64-linux";
 
   # let-bound so the tarball package below can reference the configuration
   # without reading config.flake.nixosConfigurations (freeform-merge recursion)

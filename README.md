@@ -203,11 +203,13 @@ so inside the vm: clone omni, `nh os switch .#vm`. Iterate on the host,
 ### devil — the kata pod image
 
 ```nu
-# on a NixOS host — bootstrap only; day-to-day updates are `nh os switch`
-# from inside the pod. --platform matters only if the build host is x86_64.
+# bootstrap only; day-to-day updates are `nh os switch` from inside the pod.
+# x86_64-linux (amd64, rzbl) since 2026-11-23; the arm64 line for the Pi is
+# gone. Any linux/amd64 nix builder works; from the Mac, an OrbStack
+# `nixos/nix` container builds it (everything else substitutes).
 nix build .#devil
-cp -L result/tarball/nixos-system-aarch64-linux.tar.xz .private/devil.tar.xz   # result points into the build host's nix store — dereference it
-docker import --platform linux/arm64 .private/devil.tar.xz ghcr.io/bfeitknecht/devil:latest   # run where the docker daemon lives (OrbStack: on the mac)
+cp -L result/tarball/nixos-system-x86_64-linux.tar.xz .private/devil.tar.xz   # result points into the build host's nix store — dereference it
+docker import --platform linux/amd64 .private/devil.tar.xz ghcr.io/bfeitknecht/devil:latest   # run where the docker daemon lives (OrbStack: on the mac)
 docker push ghcr.io/bfeitknecht/devil:latest
 ```
 
