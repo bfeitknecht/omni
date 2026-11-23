@@ -1,4 +1,9 @@
-{ inputs, config, ... }:
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
 let
   # x86_64-linux since 2026-11-23: devil moved to rzbl (amd64 Blade). Kata
   # VMs on rbpi (arm64 Pi) wedged within minutes and left orphan qemus that
@@ -26,7 +31,7 @@ let
         # sessions and every later unit queue forever (the "devil freezes"
         # of 2026-11-22/23, on both nodes). The boot command already
         # registers the image store paths, so drop the unit.
-        systemd.units."register-nix-paths.service".enable = false;
+        systemd.units."register-nix-paths.service".enable = lib.mkForce false;
 
         networking.hostName = "devil";
 
