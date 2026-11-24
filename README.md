@@ -219,7 +219,7 @@ booted pod: clone omni, `nh os switch .#devil` — day-to-day
 updates never touch the image. Access to devil.internal (LAN + tailnet only, the
 router forwards nothing): **ssh** — port 2223 (the VM's sshd listens on 2222), pubkey-only (`ssh/devil` in
 sops; the private half rides to ish out-of-band) and **Rex** (sessions on the
-VM's personal Rex server, reached over that ssh). No browser terminal: the
+VM's personal Rex server, tailnet node `deviler`). Next: Tailscale SSH on the node `devil` (`ssh bf@devil`, no key) replaces sshd and port 2223 once proven. No browser terminal: the
 ghostty-web page was removed 2026-11-20.
 
 ## deferred

@@ -56,6 +56,28 @@ let
           2222 # sshd — the devil.internal TCPRoute (gateway listener devilssh)
         ];
 
+        # Tailscale SSH: devil's own tailnet node `devil`, owned by bf, so
+        # only bf's devices get in (tailnet policy `ssh` rule). Replaces sshd
+        # + the devilssh gateway route once it is proven. Userspace
+        # networking: the Kata VM has no /dev/net/tun. State on the PVC
+        # (/nix is the PVC; --state/--statedir after the unit's own flags
+        # win) so a pod restart keeps the node. First start: `sudo tailscale
+        # up --ssh`, open the link, disable key expiry in the admin console.
+        services.tailscale = {
+          enable = true;
+          interfaceName = "userspace-networking";
+          extraDaemonFlags = [
+            "--state=/nix/var/lib/tailscale/tailscaled.state"
+            "--statedir=/nix/var/lib/tailscale"
+          ];
+          # cluster DNS stays the resolver; MagicDNS is not needed here
+          extraSetFlags = [
+            "--ssh"
+            "--accept-dns=false"
+          ];
+        };
+        systemd.tmpfiles.rules = [ "d /nix/var/lib/tailscale 0700 root root -" ];
+
         services.openssh = {
           enable = true;
           ports = [ 2222 ];
@@ -92,15 +114,16 @@ let
         home-manager.users.${config.flake.username} = {
           # Rex personal server for bf (systemd user service). Clients come in
           # over ssh (ssh://devil.internal) or over the tailnet: Rex runs its
-          # own Tailscale node `devil` (https://devil.<tailnet>.ts.net), owned
-          # by bf's account, so only bf's devices get in. First start: open
-          # the sign-in link from `rex server status`. The identity stays in
-          # ~/.local/state/rex on the PVC. ("rex" on the tailnet is the Mac app.)
+          # own Tailscale node `deviler` (https://deviler.<tailnet>.ts.net),
+          # owned by bf's account, so only bf's devices get in. Rex nodes
+          # carry an r; the plain host name is the machine's own tailscaled
+          # node. First start: open the sign-in link from `rex server
+          # status`. The identity stays in ~/.local/state/rex on the PVC.
           services.rex = {
             enable = true;
             tailscale = {
               enable = true;
-              hostname = "devil";
+              hostname = "deviler";
             };
           };
 
