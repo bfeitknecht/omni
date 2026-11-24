@@ -11,6 +11,7 @@
       gpg
       secrets
       rex
+      agents
     ];
 
     home.stateVersion = "26.11";
