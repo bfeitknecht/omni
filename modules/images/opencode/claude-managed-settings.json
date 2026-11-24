@@ -4,10 +4,10 @@
     "deny": [
       "Read(//etc/opencode-providers/**)",
       "Read(//etc/opencode-git/**)",
-      "Read(//home/node/.claude/.credentials.json)",
-      "Read(//home/node/.local/share/opencode/**)",
-      "Read(//home/node/.config/opencode/**)",
-      "Read(//home/node/.ssh/**)"
+      "Read(//home/opencode/.claude/.credentials.json)",
+      "Read(//home/opencode/.local/share/opencode/**)",
+      "Read(//home/opencode/.config/opencode/**)",
+      "Read(//home/opencode/.ssh/**)"
     ]
   },
   "sandbox": {

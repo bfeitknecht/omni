@@ -48,16 +48,16 @@ let
     '';
   };
 
-  # uid 1000 (node), the owner of the PVC home. Single-user nix: the whole
-  # image, /nix included, belongs to node, so `nix develop` works without a
+  # uid 1000 (opencode), the owner of the PVC home. Single-user nix: the whole
+  # image, /nix included, belongs to opencode, so `nix develop` works without a
   # daemon or root.
   passwd = pkgs.runCommand "opencode-passwd" { } ''
     mkdir -p $out/etc
     echo 'root:x:0:0:root:/root:/bin/sh' > $out/etc/passwd
-    echo 'node:x:1000:1000:node:/home/node:/bin/bash' >> $out/etc/passwd
+    echo 'opencode:x:1000:1000:opencode:/home/opencode:/bin/bash' >> $out/etc/passwd
     echo 'nobody:x:65534:65534:nobody:/:/bin/false' >> $out/etc/passwd
     echo 'root:x:0:' > $out/etc/group
-    echo 'node:x:1000:' >> $out/etc/group
+    echo 'opencode:x:1000:' >> $out/etc/group
     echo 'nobody:x:65534:' >> $out/etc/group
     echo 'hosts: files dns' > $out/etc/nsswitch.conf
   '';
@@ -109,7 +109,7 @@ let
 
   # The bash sandbox policy (the plugin reads OPENCODE_SANDBOX_CONFIG_PATH).
   # Writes: the project, /tmp and single-user nix (/nix and nix's caches),
-  # but never a path the image ships: the store owner is node, and those
+  # but never a path the image ships: the store owner is opencode, and those
   # paths run unsandboxed (server, plugin, Claude Code, MCP servers), so
   # every one of them is write-denied. Reads: secrets, opencode's state with
   # the API keys, the Claude login. Network: the domain allowlist (infra's
@@ -117,7 +117,7 @@ let
   sandboxPolicy =
     let
       closure = pkgs.closureInfo { rootPaths = contents ++ [ opencode-sandbox ]; };
-      home = "/home/node";
+      home = "/home/opencode";
       base = {
         mode = "enforce";
         filesystem = {
@@ -190,36 +190,36 @@ let
     tag = "dev";
     uid = 1000;
     gid = 1000;
-    uname = "node";
-    gname = "node";
+    uname = "opencode";
+    gname = "opencode";
     includeNixDB = true;
     inherit contents;
     fakeRootCommands = ''
-      mkdir -p lib64 tmp home/node/Projects opt/opencode-sandbox etc/claude-code
+      mkdir -p lib64 tmp home/opencode/Projects opt/opencode-sandbox etc/claude-code
       chmod 1777 tmp
       # the FHS loader for the prebuilt OpenCode binary
       ln -s ${pkgs.glibc}/lib64/ld-linux-x86-64.so.2 lib64/ld-linux-x86-64.so.2
       # loaded by file:// URL from infra opencode.json (directory form; v2
       # resolves the package entry dist/v2.js). A root-owned copy, not a
       # link: OpenCode watches the plugin and reloads it on change, and the
-      # store belongs to node.
+      # store belongs to opencode.
       cp -rL ${opencode-sandbox}/lib/node_modules/opencode-sandbox-pin/node_modules opt/opencode-sandbox/node_modules
       cp ${sandboxPolicy} etc/opencode-sandbox.json
       # Claude Code's own bash sandbox, the same deny-read rules and domain
       # allowlist as the plugin, no bypass mode
       cp ${./opencode/claude-managed-settings.json} etc/claude-code/managed-settings.json
-      # Single-user nix and the home belong to node. The store paths come in
+      # Single-user nix and the home belong to opencode. The store paths come in
       # with uid 1000 (above); this layer holds /nix/store itself and the db.
       # /opt and /etc/claude-code stay root's: the agent cannot edit them.
       chown -R 1000:1000 nix home
     '';
     config = {
       User = "1000:1000";
-      WorkingDir = "/home/node";
+      WorkingDir = "/home/opencode";
       Env = [
         "PATH=/bin:/usr/bin"
-        "HOME=/home/node"
-        "USER=node"
+        "HOME=/home/opencode"
+        "USER=opencode"
         "TMPDIR=/tmp"
         "SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
         "NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt"
