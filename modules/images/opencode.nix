@@ -71,8 +71,8 @@ let
   '';
 
   # Everything the image runs outside the bash sandbox: the server, the
-  # plugin and its bwrap/socat/rg, git (snapshots), Claude Code, the MCP
-  # servers, the loader.
+  # plugin and its bwrap/socat/rg, git (snapshots), Claude Code, the
+  # loader.
   contents = [
     pkgs.dockerTools.caCertificates
     pkgs.dockerTools.usrBinEnv
@@ -104,9 +104,6 @@ let
     pkgs.jq
     pkgs.git
     pkgs.nodejs_22
-    # MCP servers for the bot (configured in infra opencode.json)
-    pkgs.mcp-nixos
-    pkgs.forgejo-mcp
   ];
 
   # The bash sandbox policy (the plugin reads OPENCODE_SANDBOX_CONFIG_PATH).
