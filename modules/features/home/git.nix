@@ -32,16 +32,9 @@
         gh-enhance
       ];
     };
-    programs.jujutsu = {
-      enable = true;
-      settings = {
-        user = {
-          email = "bfeitknecht@ethz.ch";
-          name = "Basil Feitknecht";
-        };
-      };
-    };
-
-    home.packages = with pkgs; [ tea ];
+    home.packages = with pkgs; [
+      tea
+      glab
+    ];
   };
 }

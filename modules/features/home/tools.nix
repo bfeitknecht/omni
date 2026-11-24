@@ -23,6 +23,7 @@
 
     home.packages = with pkgs; [
       dust
+      yq-go
       age
       sops
       lua

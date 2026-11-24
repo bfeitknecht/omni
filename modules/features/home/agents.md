@@ -6,7 +6,7 @@ There is one way to do each task. Use the tool this file names; do not pick anot
 
 ## How to talk to me
 
-I have ADHD. Long answers cost me effort. So:
+Long answers cost me effort. So:
 
 - Write ASD-STE100 Simplified Technical English everywhere: answers, comments, commit
   messages, docs. Short sentences. One instruction per sentence. Active voice.
@@ -59,7 +59,7 @@ I have ADHD. Long answers cost me effort. So:
 | --- | --- |
 | Search text, find files | `rg`, `fd` |
 | JSON, YAML | `jq`, `yq` |
-| Version control | `jj` if the repository has `.jj/`, else `git` |
+| Version control | `git` |
 | Forgejo (`git.0xbf.ch`, my main forge) | `tea` |
 | GitHub | `gh` (my GitHub repos are mirrors of Forgejo: never push to them) |
 | GitLab | `glab` |

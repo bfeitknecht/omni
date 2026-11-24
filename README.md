@@ -89,8 +89,8 @@ am_or_rebase = "AM/REBASE"
 - lix
 - git
 - delta
-- jujutsu
 - tea
+- glab
 - gh
 - neovim
 - helix
@@ -139,8 +139,8 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │   └── home/             the home-manager class tree, exported as flake.modules.homeManager.*
 │       ├── default.nix   aggregator: imports all classes, home.stateVersion lives here
 │       ├── shell.nix     zsh (zimfw), nushell (`use user *`), zoxide, direnv
-│       ├── tools.nix     rg fd bat eza bottom television uv + dust tlrc age sops lua deno
-│       ├── git.nix       git delta jujutsu tea gh
+│       ├── tools.nix     rg fd bat eza bottom television uv + dust yq tlrc age sops lua deno
+│       ├── git.nix       git delta tea glab gh
 │       ├── editor.nix    neovim (nvf), helix
 │       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
