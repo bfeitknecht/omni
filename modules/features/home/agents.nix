@@ -23,7 +23,13 @@
       # API keys: sops renders each to a file; opencode reads it at start
       # ({file:...}), so no key sits in an env var a command could print.
       # Same keys as infra opencode-providers (the pod).
-      sops.secrets = lib.genAttrs (map (p: "opencode/${p}") providers) (_: { });
+      sops.secrets = lib.genAttrs (
+        map (p: "opencode/${p}") providers
+        ++ [
+          "mcp/github"
+          "mcp/forgejo"
+        ]
+      ) (_: { });
 
       xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
         "$schema" = "https://opencode.ai/config.json";
@@ -43,6 +49,28 @@
           nixos = {
             type = "local";
             command = [ (lib.getExe pkgs.mcp-nixos) ];
+          };
+          # GitHub as bf (fine-grained token; the repos there are mirrors of
+          # Forgejo, so mostly reading: issues, PRs, Actions runs)
+          github = {
+            type = "local";
+            command = [
+              (lib.getExe pkgs.github-mcp-server)
+              "stdio"
+            ];
+            environment.GITHUB_PERSONAL_ACCESS_TOKEN = "{file:${config.sops.secrets."mcp/github".path}}";
+          };
+          # Forgejo (git.0xbf.ch) as bf: repos, issues, PRs, releases
+          forgejo = {
+            type = "local";
+            command = [
+              (lib.getExe pkgs.forgejo-mcp)
+              "--transport"
+              "stdio"
+              "--url"
+              "https://git.0xbf.ch"
+            ];
+            environment.FORGEJO_ACCESS_TOKEN = "{file:${config.sops.secrets."mcp/forgejo".path}}";
           };
         };
       };
