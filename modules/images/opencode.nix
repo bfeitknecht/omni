@@ -141,10 +141,9 @@ let
               ".claude"
               ".claude.json"
             ]
-            ++ [
-              "/etc/opencode-providers"
-              "/etc/opencode-git"
-            ];
+            # not /etc/opencode-git: git's credential helper reads it inside
+            # the sandbox (the bot's push token, scoped to bf/* repos)
+            ++ [ "/etc/opencode-providers" ];
           allowWrite = [
             "\${directory}"
             "\${worktree}"
