@@ -99,6 +99,7 @@ let
     pkgs.xz
     pkgs.less
     pkgs.procps
+    pkgs.util-linux
     pkgs.which
     pkgs.curl
     pkgs.jq
