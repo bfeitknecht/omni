@@ -52,17 +52,14 @@ let
 
         # inside kata VM build sandbox cannot resolve DNS
         nix.settings.sandbox = false;
-        networking.firewall.allowedTCPPorts = [
-          2222 # sshd — the devil.internal TCPRoute (gateway listener devilssh)
-        ];
-
-        # Tailscale SSH: devil's own tailnet node `devil`, owned by bf, so
-        # only bf's devices get in (tailnet policy `ssh` rule). Replaces sshd
-        # + the devilssh gateway route once it is proven. Userspace
+        # Tailscale SSH is the only way in (no sshd since 2026-11-24): devil's
+        # own tailnet node `devil`, tagged tag:devil; the tailnet policy lets
+        # bf's own devices ssh in as bf (`ssh bf@devil`). Userspace
         # networking: the Kata VM has no /dev/net/tun. State on the PVC
         # (/nix is the PVC; --state/--statedir after the unit's own flags
         # win) so a pod restart keeps the node. First start: `sudo tailscale
-        # up --ssh`, open the link, disable key expiry in the admin console.
+        # up --ssh --accept-dns=false --hostname=devil --advertise-tags=tag:devil`
+        # (from `kubectl exec`), open the link. Break-glass: kubectl exec.
         services.tailscale = {
           enable = true;
           interfaceName = "userspace-networking";
@@ -77,25 +74,6 @@ let
           ];
         };
         systemd.tmpfiles.rules = [ "d /nix/var/lib/tailscale 0700 root root -" ];
-
-        services.openssh = {
-          enable = true;
-          ports = [ 2222 ];
-          settings = {
-            # keys only — the login password is for sudo and the console
-            PasswordAuthentication = false;
-            KbdInteractiveAuthentication = false;
-            PermitRootLogin = "no";
-            # authorized_keys come from sops, rendered at boot
-            AuthorizedKeysFile = "/run/secrets/ssh/devil.pub";
-          };
-          hostKeys = [
-            {
-              path = "/var/lib/ssh/ssh_host_ed25519_key";
-              type = "ed25519";
-            }
-          ];
-        };
 
         users.users.${config.flake.username} = {
           hashedPasswordFile = "/run/secrets-for-users/login/devil";
@@ -113,7 +91,7 @@ let
 
         home-manager.users.${config.flake.username} = {
           # Rex personal server for bf (systemd user service). Clients come in
-          # over ssh (ssh://devil.internal) or over the tailnet: Rex runs its
+          # over ssh (ssh://devil, Tailscale SSH) or over the tailnet: Rex runs its
           # own Tailscale node `deviler` (https://deviler.<tailnet>.ts.net),
           # owned by bf's account, so only bf's devices get in. Rex nodes
           # carry an r; the plain host name is the machine's own tailscaled
@@ -165,9 +143,6 @@ let
           defaultSopsFile = ../../secrets/secrets.sops.yaml;
           age.keyFile = "/home/${config.flake.username}/.config/sops/age/keys.txt";
           secrets."login/devil".neededForUsers = true;
-          # sshd reads the pub half as the login user — 0444 beats any
-          # render owner (verified in-VM: root-owned 0444 → accepted)
-          secrets."ssh/devil.pub".mode = "0444";
           # opencode server password (same value as infra opencode-secrets
           # server-password); the `oc` wrapper reads it at runtime
           secrets."opencode/server-password" = {

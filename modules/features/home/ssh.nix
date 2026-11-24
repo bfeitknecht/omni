@@ -19,8 +19,6 @@
         "ssh/forgejo.pub".path = "${config.home.homeDirectory}/.ssh/forgejo.pub";
         "ssh/tangled".path = "${config.home.homeDirectory}/.ssh/tangled";
         "ssh/tangled.pub".path = "${config.home.homeDirectory}/.ssh/tangled.pub";
-        "ssh/devil".path = "${config.home.homeDirectory}/.ssh/devil";
-        "ssh/devil.pub".path = "${config.home.homeDirectory}/.ssh/devil.pub";
       };
 
       # HM's built-in Host * defaults are deprecated; we declare everything
@@ -63,18 +61,11 @@
         };
 
         # Tailscale SSH (devil's own tailnet node; no key, the tailnet
-        # policy decides). Zed remote and Rex use this once it works.
+        # policy decides). Zed remote, Rex and `oc` use it.
         settings."devil" = {
           user = config.home.username;
         };
 
-        # gateway listener devilssh (2223) -> the VM's sshd on 2222; goes
-        # away with sshd once Tailscale SSH is proven
-        settings."devil.internal" = {
-          user = config.home.username;
-          port = 2223;
-          identityFile = "~/.ssh/devil";
-        };
       };
     };
 }

@@ -1,7 +1,7 @@
 { inputs, ... }: {
   # Rex (Superlogical): persistent terminal sessions, plus `oc` (opencode). devil runs the server
   # (hosts/devil.nix turns on services.rex); every other host is a client
-  # and reaches devil over ssh, with the devil.internal entry in ssh.nix.
+  # and reaches devil over Tailscale SSH (the `devil` entry in ssh.nix).
   flake.modules.homeManager.rex =
     {
       config,
@@ -18,7 +18,7 @@
       # its own `oc` (hosts/devil.nix).
       home.packages = lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
         (pkgs.writeShellScriptBin "oc" ''
-          exec ssh -t devil.internal oc "$@"
+          exec ssh -t devil oc "$@"
         '')
       ];
 
@@ -29,7 +29,7 @@
         # the server reads init.lua; devil does not list itself
         config = lib.mkIf (!config.services.rex.enable) (
           pkgs.writeText "init.lua" ''
-            rex.host{ label = "devil", endpoint = "ssh://devil.internal" }
+            rex.host{ label = "devil", endpoint = "ssh://devil" }
           ''
         );
       };

@@ -145,8 +145,8 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
 │       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
-│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil :2223)
-│       ├── rex.nix       Rex client everywhere; init.lua lists devil (the server runs on devil)
+│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil over Tailscale SSH)
+│       ├── rex.nix       Rex client everywhere; init.lua lists devil (ssh://devil; the server runs on devil)
 │       └── secrets.nix   sops-nix HM module + age key location
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)
@@ -216,10 +216,11 @@ docker push ghcr.io/bfeitknecht/devil:latest
 The image is only the bootstrap (the entrypoint lives in the infra tree's
 `applications/devil/deployment.yaml` as `command: ["/init"]`). Inside the
 booted pod: clone omni, `nh os switch .#devil` — day-to-day
-updates never touch the image. Access to devil.internal (LAN + tailnet only, the
-router forwards nothing): **ssh** — port 2223 (the VM's sshd listens on 2222), pubkey-only (`ssh/devil` in
-sops; the private half rides to ish out-of-band) and **Rex** (sessions on the
-VM's personal Rex server, tailnet node `deviler`). Next: Tailscale SSH on the node `devil` (`ssh bf@devil`, no key) replaces sshd and port 2223 once proven. No browser terminal: the
+updates never touch the image. Access is tailnet only, no sshd (since
+2026-11-24): **ssh** is Tailscale SSH on devil's own node `devil` (`ssh bf@devil`,
+no key: the tailnet policy admits bf's own Macs and phones; Zed remote and ish
+use it too) and **Rex** (sessions on the VM's personal Rex server, tailnet node
+`deviler`). Break-glass: `kubectl exec` into the pod. No browser terminal: the
 ghostty-web page was removed 2026-11-20.
 
 ## deferred
