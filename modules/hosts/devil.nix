@@ -85,6 +85,10 @@ let
         # the standard glibc loader; nix-ld provides it.
         programs.nix-ld.enable = true;
 
+        # claude-code is the only unfree package: opencode's Claude Agent
+        # provider runs `claude` from PATH (subscription login: `claude`, /login)
+        nixpkgs.config.allowUnfreePredicate = pkg: lib.getName pkg == "claude-code";
+
         home-manager.users.${config.flake.username} = {
           # Rex personal server for bf (systemd user service). Clients come in
           # over ssh (ssh://devil.internal) or over the tailnet: Rex runs its
@@ -104,18 +108,22 @@ let
           # ~/.config/omni is a symlink into it); nh switches this flake bare
           programs.nh.flake = "/home/${config.flake.username}/Projects/omni";
 
-          # opencode client for the isolated server in the cluster (infra
-          # applications/opencode, Kata VM). The version must match the
-          # server pin in infra opencode.yaml: bump both together. v2 clients
-          # connect with --server (v1 `attach` is gone); the session runs in
-          # the server VM, devil is only the screen. The v2 server always
-          # requires a password: OPENCODE_PASSWORD comes from sops, the same
-          # value as infra opencode-secrets key server-password.
+          # Two tiers. `opencode`: the hands-on agent, running here as bf
+          # (its background service holds the sessions; Zed remote, Rex and
+          # the TUI all reach the same ones; providers and MCP from
+          # features/home/agents.nix). `oc`: hands-off work on the isolated
+          # server in the cluster (infra applications/opencode, Kata VM, bot
+          # identity); the session runs in that VM, devil is only the screen.
+          # The version must match the server pin in infra opencode.yaml:
+          # bump both together. The v2 server always requires a password:
+          # OPENCODE_PASSWORD comes from sops, the same value as infra
+          # opencode-secrets key server-password.
           home.packages =
             let
               version = "2.4.0";
             in
             [
+              pkgs.claude-code
               (pkgs.writeShellScriptBin "opencode" ''
                 export PATH=${pkgs.nodejs_22}/bin:$PATH
                 exec npx -y @opencode/cli@${version} "$@"
