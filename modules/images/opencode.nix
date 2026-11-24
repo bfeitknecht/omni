@@ -229,13 +229,12 @@ let
         "OPENCODE_SANDBOX_CONFIG_PATH=/etc/opencode-sandbox.json"
       ];
       # serve is the v2 server command; it serves the web UI too
+      # The sandbox can only allow writes to paths that exist: create nix's
+      # cache and state dirs on the (PVC) home first.
       Cmd = [
-        "opencode"
-        "serve"
-        "--hostname"
-        "0.0.0.0"
-        "--port"
-        "4096"
+        "sh"
+        "-c"
+        "mkdir -p \"$HOME/.cache/nix\" \"$HOME/.local/state/nix\" && exec opencode serve --hostname 0.0.0.0 --port 4096"
       ];
       ExposedPorts."4096/tcp" = { };
     };
