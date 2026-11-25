@@ -162,31 +162,23 @@ classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`
 
 Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (macOS settings, casks, fonts, configs, data). The order of the day: `docs/RESET.md`.
 
-```nu
-# 1. lix owns the daemon — nix-darwin runs with nix.enable = false
-curl -sSf -L https://install.lix.systems/lix | sh -s -- install
+On a fresh Mac, in Terminal.app (the setup assistant done, FileVault on):
 
-# 2. developer tools — git for the clone, toolchain for local builds
-xcode-select --install
-
-# 3. clone omni — nix-homebrew installs homebrew itself on first switch
-git clone https://github.com/bfeitknecht/omni.git ~/Projects/omni
-cd ~/Projects/omni
-
-# 4. first switch (nh comes with the config itself)
-sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#anti
-
-# 5. secrets — age key + encrypted store, then switch again
-#    (full runbook: secrets/README.md)
-age-keygen -y ~/.config/sops/age/keys.txt   # → .sops.yaml creation_rules
-sops secrets/secrets.sops.yaml
-nh darwin switch
-
-# from here on, from anywhere:
-nh darwin switch
-
-# later, once the sops-managed key exists: switch the remote to ssh
+```sh
+curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
 ```
+
+`install.sh` checks the machine (macOS, Apple silicon, not root, a known
+host, network, FileVault), lists the manual steps, then installs the Xcode
+Command Line Tools, Lix (its own installer, with its own output), asks for
+the age key (hidden input) if `~/.config/sops/age/keys.txt` is missing,
+clones omni to `~/Projects/omni` and runs the first switch with the
+nix-darwin that `flake.lock` pins. Each step is skipped when it is done, so a
+re-run is safe. `--dry-run` prints the commands without running them.
+
+From then on, from anywhere: `nh darwin switch`.
+
+New machine with a new age key instead of the shared one: `secrets/README.md`.
 
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 

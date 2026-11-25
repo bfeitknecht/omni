@@ -52,28 +52,31 @@ after, one piece at a time. What the baseline has:
 
 ## C. Day one on anti
 
-Follow the README bootstrap. Order and checks:
+1. Setup assistant: Apple ID, **FileVault on**, Touch ID. The name does not
+   matter: the switch sets it to `anti`.
+2. In Terminal.app, one command (have the age key from Proton Pass ready to
+   paste; the script asks for it):
 
-1. Setup assistant: name the Mac `anti`, Apple ID, **FileVault on**, Touch ID.
-2. `xcode-select --install`, then the lix installer.
-3. age key back to `~/.config/sops/age/keys.txt` (mode 600).
-4. Clone omni to `~/Projects/omni` (all repos live in `~/Projects/<name>`; nh
-   expects the flake there) and switch:
-   `sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#anti`, after
-   that `nh darwin switch`. sops-nix writes the ssh keys and the gpg identity.
-   Log out and in once: Dock, Finder and trackpad settings apply then.
-   `wallpaper` sets the NULL wallpaper for the current appearance.
-5. Tailscale: sign in, name `anti`; remove the old `echo` node in the admin
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
+   ```
+
+   It installs the Xcode Command Line Tools, Lix, the age key, clones omni to
+   `~/Projects/omni` (all repos live in `~/Projects/<name>`) and runs the
+   first switch. sops-nix writes the ssh keys and the gpg identity.
+3. Open Ghostty, log out and in once (Dock, Finder, trackpad apply then), run
+   `wallpaper`.
+4. Tailscale: sign in, name `anti`; remove the old `echo` node in the admin
    console. Check `ssh bf@devil` and `kubectl` over the tailnet.
-6. Clone the other repos from Forgejo to `~/Projects/<repo>`
+5. Clone the other repos from Forgejo to `~/Projects/<repo>`
    (`ssh://git@git.0xbf.ch/bf/<repo>.git`), then copy back the `.private/`
    dirs from the backup.
-7. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`;
+6. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`;
    check `kubectl get nodes`.
-8. Internal CA into the System keychain and trust it (infra AGENTS, Internal CA).
-9. atuin: `atuin login` with the saved key, `atuin sync`.
-10. CLI logins: `gh`, `tea`, `glab` (atlas `cli-logins`).
-11. Manual rest (`MIGRATION.md` section 3): App Store login, Mail accounts,
+7. Internal CA into the System keychain and trust it (infra AGENTS, Internal CA).
+8. atuin: `atuin login` with the saved key, `atuin sync`.
+9. CLI logins: `gh`, `tea`, `glab` (atlas `cli-logins`).
+10. Manual rest (`MIGRATION.md` section 3): App Store login, Mail accounts,
     Swiss German input, login items, licences, Rex Beta + remote `devil`,
     Zed remote host `devil`.
 

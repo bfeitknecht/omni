@@ -28,6 +28,7 @@ in
             "orbstack"
             "utm"
             # security
+            "tailscale-app" # the tailnet: devil, the cluster, kubectl
             "proton-mail"
             "proton-pass"
             "proton-vpn"
