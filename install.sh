@@ -230,18 +230,34 @@ first_switch() {
   step "First switch: nix-darwin, home-manager, Homebrew"
   info "Builds the whole system (several GB on a fresh machine), then activates it."
   info "Homebrew is installed by nix-homebrew, the casks after it; this takes a while."
-  # The Lix installer edits these shell files; nix-darwin refuses to replace
-  # files it did not write. Keep them as .before-nix-darwin, as it suggests.
-  for f in /etc/bashrc /etc/zshrc /etc/zshenv; do
-    if [ -f "$f" ] && [ ! -L "$f" ]; then
-      run sudo mv "$f" "$f.before-nix-darwin"
-    fi
-  done
   # Build as the user first (output below), then activate with the
   # darwin-rebuild of that build: the nix-darwin version omni's flake.lock
   # pins. sudo resets PATH: give it nix and the system dirs.
   system="$TMP/omni-$HOST-system"
   run nix build --print-out-paths -o "$system" "$OMNI_DIR#darwinConfigurations.$HOST.system"
+
+  # nix-darwin owns /etc/zshrc, /etc/bashrc, /etc/zshenv, /etc/zprofile (and
+  # the other files under its etc/). It refuses to replace a file it does not
+  # know, and Lix's installer has added its lines to the shell files. Those
+  # lines only put nix on PATH; nix-darwin's own environment does that too
+  # (and the daemon is a launchd job, not a shell line). So every real file
+  # the new system manages is kept as <file>.before-nix-darwin (the name
+  # nix-darwin uses itself) and replaced. A backup that exists is never
+  # overwritten: a later one gets a date.
+  info "Files in /etc that nix-darwin takes over (originals kept as .before-nix-darwin):"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    run sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin
+    info "(dry run: the real list comes from the build)"
+  else
+    managed="$(cd "$system/etc" && find -L . -type f | sed 's|^\./||')"
+    for f in $managed; do
+      target="/etc/$f"
+      [ -e "$target" ] && [ ! -L "$target" ] || continue
+      backup="$target.before-nix-darwin"
+      [ -e "$backup" ] && backup="$backup.$(date +%Y%m%d%H%M%S)"
+      run sudo mv "$target" "$backup"
+    done
+  fi
   run sudo -H env PATH="$NIX_BIN:/usr/bin:/bin:/usr/sbin:/sbin" NIX_CONFIG="$NIX_CONFIG" "$system/sw/bin/darwin-rebuild" switch --flake "$OMNI_DIR#$HOST"
   run rm -f "$system"
 }

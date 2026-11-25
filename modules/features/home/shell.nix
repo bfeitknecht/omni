@@ -45,8 +45,7 @@
             status = {
               # off by default in starship: without this [ERR] never shows
               disabled = false;
-              format = ''\[$status\]($style)'';
-              style = "bold red";
+              format = ''\[$status\]'';
             };
             git_branch.format = "$branch";
             git_state = {
@@ -187,27 +186,33 @@
           $env.STARSHIP_SHELL = "nu"
           $env.config.render_right_prompt_on_last_line = false
 
+          # The prompt is monochrome in both shells: starship sets no style,
+          # and nushell's own prompt colours (reedline paints the prompt
+          # green, the indicators cyan) are cancelled by a reset at the start
+          # of every prompt string. Colour on the command line is theme.nix.
+          let reset = (ansi reset)
+
           $env.PROMPT_COMMAND = { ||
             # compact in Zed and Rex (REX_SESSION is set in every Rex block)
             if ('ZED_TERM' in $env or 'REX_SESSION' in $env) {
-              ""
+              $reset
             } else {
-              (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
+              $reset ++ (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
             }
           }
           $env.PROMPT_COMMAND_RIGHT = { ||
-            ^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)"
+            $reset ++ (^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)")
           }
 
-          $env.PROMPT_INDICATOR = ""
-          $env.PROMPT_INDICATOR_VI_NORMAL = "$ "
-          $env.PROMPT_INDICATOR_VI_INSERT = ": "
-          $env.PROMPT_MULTILINE_INDICATOR = "... "
+          $env.PROMPT_INDICATOR = $reset
+          $env.PROMPT_INDICATOR_VI_NORMAL = $"($reset)$ "
+          $env.PROMPT_INDICATOR_VI_INSERT = $"($reset): "
+          $env.PROMPT_MULTILINE_INDICATOR = $"($reset)... "
 
-          $env.TRANSIENT_PROMPT_COMMAND = { || "" }
-          $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || "" }
-          $env.TRANSIENT_PROMPT_INDICATOR = "$"
-          $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = "    "
+          $env.TRANSIENT_PROMPT_COMMAND = { || $reset }
+          $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || $reset }
+          $env.TRANSIENT_PROMPT_INDICATOR = $"($reset)$"
+          $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = $"($reset)    "
 
           use user *
         '';

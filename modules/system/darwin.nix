@@ -19,6 +19,9 @@
 
     # the lix installer owns the daemon and /etc/nix/nix.conf
     nix.enable = false;
+    # nix-darwin owns the shell files in /etc (zshrc, zshenv, zprofile,
+    # bashrc): its environment puts nix on PATH, so Lix's lines there are not
+    # needed. install.sh keeps the originals as <file>.before-nix-darwin.
 
     # the darwin home fact, once — HM derives home.homeDirectory from it
     users.users.${config.flake.username}.home = "/Users/${config.flake.username}";
