@@ -115,24 +115,22 @@ let
           # features/home/agents.nix). `oc`: hands-off work on the isolated
           # server in the cluster (infra applications/opencode, Kata VM, bot
           # identity); the session runs in that VM, devil is only the screen.
-          # The version must match the server pin in infra opencode.yaml:
-          # bump both together. The v2 server always requires a password:
+          # One OpenCode build for both (images/opencode/_cli.nix); infra's
+          # images/opencode/flake.lock decides when the pod follows. The v2
+          # server always requires a password:
           # OPENCODE_PASSWORD comes from sops, the same value as infra
           # opencode-secrets key server-password.
           home.packages =
             let
-              version = "2.4.0";
+              # the same build as the pod's image (images/opencode/_cli.nix)
+              opencode = pkgs.callPackage ../images/opencode/_cli.nix { };
             in
             [
               pkgs.claude-code
-              (pkgs.writeShellScriptBin "opencode" ''
-                export PATH=${pkgs.nodejs_22}/bin:$PATH
-                exec npx -y @opencode/cli@${version} "$@"
-              '')
+              opencode
               (pkgs.writeShellScriptBin "oc" ''
                 export OPENCODE_PASSWORD="$(cat /run/secrets/opencode/server-password)"
-                export PATH=${pkgs.nodejs_22}/bin:$PATH
-                exec npx -y @opencode/cli@${version} --server http://opencode.opencode.svc "$@"
+                exec ${lib.getExe opencode} --server http://opencode.opencode.svc "$@"
               '')
             ];
         };

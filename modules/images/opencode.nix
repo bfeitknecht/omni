@@ -11,25 +11,7 @@ let
   };
   inherit (pkgs) lib;
 
-  # OpenCode v2 (npm @opencode/cli; opencode-ai stays on 1.x). The prebuilt
-  # Bun binary needs only glibc. It is not patched: patchelf would break the
-  # bundle Bun appends to the file. The image links the FHS loader instead;
-  # on devil, nix-ld provides it.
-  opencode = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-    pname = "opencode";
-    version = "2.4.0";
-    src = pkgs.fetchurl {
-      url = "https://registry.npmjs.org/@opencode/cli-linux-x64/-/cli-linux-x64-${finalAttrs.version}.tgz";
-      hash = "sha256-Fj95De/tWRHlL+jWabamtzf7zx2OAHEgc6qrsKRw5Ho=";
-    };
-    dontBuild = true;
-    dontStrip = true;
-    dontPatchELF = true;
-    installPhase = ''
-      install -Dm755 bin/opencode $out/bin/opencode
-    '';
-    meta.mainProgram = "opencode";
-  });
+  opencode = pkgs.callPackage ./opencode/_cli.nix { };
 
   # The opencode-sandbox plugin: every bash command the agent runs goes
   # through bubblewrap. patch.mjs adds enableWeakerNestedSandbox (a Kata
