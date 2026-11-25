@@ -1,16 +1,14 @@
 # Roadmap
 
-Status as of 2026-11-19. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil kata-pod image on the talos cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md` — the two lanes touch at exactly two gates: the **devil deploy** and the **macbook reset**.
+Status as of 2026-11-25. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil Kata VM on the talos cluster (x86_64-linux on rzbl), the opencode server image for the cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md`.
 
 ## Where things stand
 
-- Flake shape is settled: flake-parts + import-tree, lix overlay binding the nix tool ecosystem, home-manager as the config carrier, sops-nix for secrets. Classes live in `modules/system/{linux,darwin}.nix` (`flake.modules.{nixos,darwin}.default`); hosts compose class + host facts; standalone homes derive from the hosts (`nh home switch` on every host).
-- Home modules landed: shell (zsh/zimfw + nushell `use user *`), tools, git (delta/jujutsu/tea/gh), editor (nvf + helix), nix tooling (nh/comma/nom/any-nix-shell), gpg identity (sops), sops secrets class.
-- Starship prompt landed for both shells (polish ongoing); atuin and pay-respects wired into the shell; git identity, ssh keys + new SOPS recipient in.
-- Hosts: `anti` (darwin, the new MacBook Pro; was `auto` — nix-homebrew owns brew, zed + ghostty casks active, the rest of the cask list still commented out), `devil` (NixOS docker-container tarball → kata pod image, aarch64), `vm` (microvm test bed, console autologin, shared host store + writable overlay).
-- The old MacBook (`echo`) is still the pre-nix daily driver; the move to `anti` is gated on the parity work below. What can move: `docs/MIGRATION.md`.
-- Rex: client on every host (`rex.nix`), personal server on devil.
-- TODO residue already done: gpg identity (`gpg.nix`), starship, ssh keys — prunable from `.private/TODO.md`.
+- Flake shape is settled: flake-parts + import-tree, lix overlay, home-manager as the config carrier, sops-nix for secrets. Classes live in `modules/system/{linux,darwin}.nix`; hosts compose class + host facts; standalone homes derive from the hosts (`nh home switch` on every host).
+- Home modules: shell (zsh/zimfw + nushell `use user *`), tools (incl. `yq-go`), git (delta, tea, gh, glab; jujutsu removed 2026-11-25), editor (nvf + helix), nix tooling, gpg identity, ssh (per-service keys; `devil` over Tailscale SSH), agents (`agents.md` for opencode and Claude Code, model keys from sops, no MCP servers), Rex.
+- Hosts: `anti` (darwin), `devil` (NixOS, Kata VM image, x86_64-linux; access only by Tailscale SSH, tailnet node `devil`; Rex node `deviler`; no sshd), `vm` (microvm test bed).
+- Images: `modules/images/opencode.nix` builds the opencode server image (Nix, `dockerTools.buildLayeredImage`); infra pins this flake in `images/opencode/flake.lock`. One opencode build (`modules/images/opencode/_cli.nix`) serves the pod and devil.
+- The old MacBook (`echo`) is still the daily driver; the move to `anti` is gated on the parity work below. What can move: `docs/MIGRATION.md`.
 
 ## The two gates
 
@@ -31,28 +29,24 @@ Ordered; the factory reset happens only after all of these:
 
 Then: factory reset → bootstrap per the README runbook (lix installer → xcode-select → clone → first switch → secrets) → iterate with `nh darwin switch`.
 
-## NEXT — devil (pairs with the infra deploy)
+## NEXT — devil
 
-- [x] **Keypair + login secret (owner, blocking)** — `ssh-keygen -t ed25519 -f devil -C devil`; add `ssh/devil` + `ssh/devil.pub` (ssh.nix declares both halves, like every other key) and `login/devil` (`mkpasswd -m yescrypt` of the ghostty-web login password) to `secrets/secrets.sops.yaml`. No paste step: sshd reads the pub half straight from the sops-materialized file (`AuthorizedKeysFile /run/secrets/ssh/devil.pub` — eval can't read sops, `authorizedKeys.keyFiles` is `listOf path` and forbids `/run` paths in pure eval). ⚠️ every `nh * switch` on every host fails until `ssh/devil` exists (HM sops activation); devil's additionally needs `login/devil`.
-- [x] ~~**Teleport-only access**~~ — **superseded 2026-10-20: ssh + ghostty-web**. devil ships sshd (port 2222, pubkey-only, password login blocked, host keys persisted at `/var/lib/ssh` on the PVC) and the ghostty-web terminal at `devil.internal` — ttyd in the VM serves the infra-side static page (ConfigMap at `/srv/ghostty-web`) and puts a real `login` prompt on the pty: PAM validates bf's password (`login/devil`, devil-only), the shell is the full home config. The internal-allowlist middleware is the only network gate; the router forwards nothing. The teleport agent was torn down 2026-10-24 (both trees) — ssh + ghostty-web are the only doors. Infra side (gateway `devilssh` listener, headless Service, HTTPRoute + TCPRoute) lives in `applications/devil/` — the kata VM bypasses ClusterIP translation, hence the headless Service.
-- [x] **Join token** — minted (`tctl tokens add --type=node`), sops'd into infra as `devil-teleport-token` (Secret in the `devil` namespace), mounted at `/etc/teleport-secrets/teleport-token`; the agent's `--token` reads the file. The CA pin is baked into the agent config (`ca_pin`). Removed 2026-10-24 with the teleport teardown.
-- [x] **State preservation** — devil-pvc (infra, renamed from devil-state; subPaths `home`/`ssh` — the `teleport` subPath went with the 2026-10-24 teardown). The image is only the bootstrap; day-to-day updates are in-pod `nh os switch .#devil` (the docker-container profile keeps `/init` fresh across switches); `/nix` stays ephemeral — a re-switch from the persisted clone converges. ⚠️ the PVC rename needs the volume-copy runbook on the infra side (prune deletes the old PVC) — `infra/.private/devil-pvc-rename.md`.
-- [ ] **Make devil nicer** — shell/editor parity inside the pod (it already imports the full home config).
-- [ ] **Rex on devil** — declared 2026-11-19: flake input `rex` (preview channel), home module `rex.nix` (client everywhere, `init.lua` lists devil as `ssh://devil.internal`), devil runs the personal server (`services.rex`, linger). Left: `nh os switch .#devil` in the pod, then **Add Remote Host** in Rex for Mac or `rex -S ssh://devil.internal ls`.
-- [ ] **opencode on devil → opencode web** — the opencode CLI on devil attaches to the server behind `opencode.internal` (shared sessions, Ollama, keys) instead of running its own. Infra side: the `agent-isolation` CNP only admits Traefik, so add an ingress rule from the `devil` namespace (pod-to-pod, no authentik in that path) or go through the route with a token.
-- [x] **Build + publish the bootstrap image** — on a NixOS host: `nix build .#devil` → `docker import --platform linux/arm64` → push `ghcr.io/bfeitknecht/devil:latest` (tag is meaningless — in-machine updates), then the infra tag. Infra-side steps are tracked in `infra/ROADMAP.md` NOW.
+Done and live: Kata VM on rzbl, `/nix` on the PVC, Tailscale SSH only (2026-11-24), Rex server, opencode + `oc` (attach to the cluster server), Claude Code. The history (sshd, ghostty-web, Teleport) is in git and in `infra/docs/journey.md`.
+
+- [ ] **Make devil nicer** — shell/editor parity inside the VM (it already imports the full home config).
+- [ ] **Forge CLI logins** — `gh`, `tea`, `glab` by hand on devil and anti (atlas `cli-logins`; tokens are not declarative on purpose).
 
 ## LATER — rice & iteration (post-reset)
 
 - [ ] Rice: sketchybar, yabai, dinky, jankyborder, tuna launcher, kindavim — one piece at a time, each behind `nh darwin switch`.
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
-- [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same aarch64-linux platform, same home config) before touching the real pod.
+- [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same home config) before touching the real VM. Note: devil is x86_64-linux now; the microvm on the Mac is aarch64-linux.
 - [x] **Teleport teardown** — done 2026-10-24 (after the friend demo): omni (agent unit, port 3022, the `TELEPORT_SESSION` prompt special-case in shell.nix) + infra (`infrastructure/teleport/`, the devil mounts/secret/configmap, `dependsOn`) + docs.
 
 ## SOMEDAY
 
-podman (nixos only), openvpn/tailscale on devil (undecided in the README), starship polish, whatever the rice list grows into.
+podman on devil (undecided), starship polish, whatever the rice list grows into.
 
 ## Conventions
 
