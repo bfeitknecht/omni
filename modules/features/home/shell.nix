@@ -45,7 +45,9 @@
             status = {
               # off by default in starship: without this [ERR] never shows
               disabled = false;
-              format = ''\[$status\]'';
+              # the one colour in the prompt: red on error (ANSI red)
+              format = ''\[$status\]($style)'';
+              style = "red";
             };
             git_branch.format = "$branch";
             git_state = {
@@ -186,7 +188,8 @@
           $env.STARSHIP_SHELL = "nu"
           $env.config.render_right_prompt_on_last_line = false
 
-          # The prompt is monochrome in both shells: starship sets no style,
+          # The prompt is monochrome in both shells, red on error aside:
+          # starship sets no other style,
           # and nushell's own prompt colours (reedline paints the prompt
           # green, the indicators cyan) are cancelled by a reset at the start
           # of every prompt string. Colour on the command line is theme.nix.
