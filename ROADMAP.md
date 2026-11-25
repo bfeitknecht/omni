@@ -20,16 +20,16 @@ Status as of 2026-11-25. omni is the nix lane: one dendritic flake feeding the M
 The first switch is a minimal known-good baseline; rice follows one piece at a time. Runbook: `docs/RESET.md`.
 
 - [x] **Reset runbook** — `docs/RESET.md`: the baseline (A), the last hour on echo (B), day one on anti (C).
-- [x] **macOS defaults** — echo's settings whole, `modules/system/macos.nix` (every darwin host).
+- [x] **macOS settings** — function only (Finder Quit, screenshots, trackpad, typing, Touch ID sudo), `modules/system/macos.nix`. Dock, menu bar, look: iterate after the reset (echo's set in `docs/MIGRATION.md`).
 - [x] **Casks** — the owner's list in `anti.nix`.
 - [x] **Zed** — vanilla + CommitMono + Ghostty Builtin Light/Dark themes (`features/home/{editor,theme}.nix`).
-- [x] **Colours** — ANSI only in shells and CLI tools (bat, delta, vivid LS_COLORS); frontends theme them (`features/home/theme.nix`).
+- [x] **Colours** — ANSI only in shells (zsh highlighting, nushell) and CLI tools (bat, delta, vivid LS_COLORS); frontends theme them (`features/home/theme.nix`).
 - [x] **Tools** — carapace, lazygit, lazydocker, lazysql, yazi (bat previews), uutils coreutils; helix off.
 - [x] **Wallpaper** — apex `brand/wallpaper.typ` (NULL, light and dark), `wallpaper` command.
 - [x] **Repos in `~/Projects/<name>`** on every host; nh flake default `~/Projects/omni`.
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before the erase, full stop.
 - [ ] FileVault on in the setup assistant (not declarable).
-- [ ] After the first switch: check Liquid Glass value, Dock/Finder after a re-login, `wallpaper`.
+- [ ] After the first switch: Finder and trackpad after a re-login, `sudo` with Touch ID, `wallpaper`.
 
 ## NEXT — devil
 

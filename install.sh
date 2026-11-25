@@ -123,7 +123,7 @@ manual_notice() {
       - the age key: paste it when asked (Proton Pass), or put it at
         $AGE_KEY before you start
     After:
-      - log out and in once (Dock, Finder, trackpad settings apply then)
+      - log out and in once (Finder and trackpad settings apply then)
       - \`wallpaper\` (allow the terminal to control System Events)
       - Tailscale app: sign in; App Store sign-in for store apps
       - docs/RESET.md section C has the rest (repos, kubeconfig, CA, CLI logins)

@@ -12,13 +12,17 @@ of the whole machine is optional (atlas `timemachine-mac`).
 The first switch is a minimal known-good state to return to. Rice comes
 after, one piece at a time. What the baseline has:
 
-- [x] **macOS defaults:** echo's settings, whole (`modules/system/macos.nix`).
+- [x] **macOS settings:** function only (`modules/system/macos.nix`): Finder
+      with Quit, screenshots to the clipboard, tap to click, no autocorrect,
+      Touch ID for sudo. Dock, menu bar and look stay at Apple's defaults for
+      now; echo's full set is in `MIGRATION.md` section 1.
 - [x] **Casks:** the owner's list in `anti.nix` (`onActivation.cleanup = "zap"`
       removes anything not listed: install other apps through the list).
 - [x] **Fonts:** CommitMono Nerd Font only.
 - [x] **Zed:** vanilla, plus font and the Ghostty Builtin Light/Dark themes
       (`features/home/{editor,theme}.nix`).
-- [x] **Colours:** shells and CLI tools use ANSI only; the frontend themes them
+- [x] **Colours:** shells (zsh highlighting and suggestions, nushell shapes and
+      tables) and CLI tools use ANSI only; the frontend themes them
       (`features/home/theme.nix`).
 - [x] **CLI tools:** carapace, lazygit, lazydocker, lazysql, yazi (bat previews),
       uutils coreutils, vivid; helix off.
@@ -64,7 +68,7 @@ after, one piece at a time. What the baseline has:
    It installs the Xcode Command Line Tools, Lix, the age key, clones omni to
    `~/Projects/omni` (all repos live in `~/Projects/<name>`) and runs the
    first switch. sops-nix writes the ssh keys and the gpg identity.
-3. Open Ghostty, log out and in once (Dock, Finder, trackpad apply then), run
+3. Open Ghostty, log out and in once (Finder and trackpad apply then), run
    `wallpaper`.
 4. Tailscale: sign in, name `anti`; remove the old `echo` node in the admin
    console. Check `ssh bf@devil` and `kubectl` over the tailnet.
