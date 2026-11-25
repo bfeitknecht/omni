@@ -160,7 +160,7 @@ classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`
 
 ### macbook (`anti`)
 
-Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (macOS settings, casks, fonts, configs, data). Time Machine of echo first (infra `docs/LIVE.md` step 0).
+Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (macOS settings, casks, fonts, configs, data). The order of the day: `docs/RESET.md`.
 
 ```nu
 # 1. lix owns the daemon — nix-darwin runs with nix.enable = false

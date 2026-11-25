@@ -19,7 +19,9 @@ Status as of 2026-11-25. omni is the nix lane: one dendritic flake feeding the M
 
 Ordered; the factory reset happens only after all of these:
 
-- [ ] **Reset runbook** — write it before doing it: what leaves the Mac (age key, ssh keys, browser profiles, app data that is not in nix), the order of the day, what omni restores (`nix-darwin` + home), what stays manual (FileVault, App Store, logins), a time budget, and a rollback (Time Machine to `smb://10.10.20.145` first). Then make the move.
+**This is the next push** (owner, 2026-11-25): factory reset, apply omni. The owner has a backup of everything important in the user home.
+
+- [x] **Reset runbook** — `docs/RESET.md` (2026-11-25): decisions first (section A), the last hour on echo (B), day one on anti (C).
 
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
 - [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
