@@ -124,6 +124,9 @@
           fi
           [[ -e "''${ZIM_HOME}/init.zsh" ]] && source "''${ZIM_HOME}/init.zsh"
 
+          # carapace completions need compinit, which zimfw ran just above
+          source <(${pkgs.carapace}/bin/carapace _carapace zsh)
+
           # any-nix-shell's prompt hook is not sourced — its precmd
           # unconditionally re-sets RPROMPT, clobbering starship's
           # right_format. The command wrappers stay: nix-shell / nix run /

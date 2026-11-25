@@ -170,8 +170,8 @@ curl -sSf -L https://install.lix.systems/lix | sh -s -- install
 xcode-select --install
 
 # 3. clone omni — nix-homebrew installs homebrew itself on first switch
-git clone https://github.com/bfeitknecht/omni.git ~/.config/omni
-cd ~/.config/omni
+git clone https://github.com/bfeitknecht/omni.git ~/Projects/omni
+cd ~/Projects/omni
 
 # 4. first switch (nh comes with the config itself)
 sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#anti
@@ -191,8 +191,8 @@ nh darwin switch
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 
 ```nu
-git clone https://github.com/bfeitknecht/omni.git ~/.config/omni
-cd ~/.config/omni
+git clone https://github.com/bfeitknecht/omni.git ~/Projects/omni
+cd ~/Projects/omni
 nix run .#vm                    # console autologin; TCG when /dev/kvm is missing
 ```
 

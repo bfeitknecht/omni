@@ -22,21 +22,33 @@ in
           enable = true;
           onActivation.cleanup = "zap";
           casks = [
+            # development
             "zed"
             "ghostty"
-            # "spotify"
-            # "whatsapp"
-            # "signal"
-            # "orbstack"
-            # "prusaslicer"
+            "orbstack"
+            "utm"
+            # security
+            "proton-mail"
+            "proton-pass"
+            "proton-vpn"
+            # creating
+            "obsidian"
+            "prusaslicer"
+            "audacity"
+            # communication
+            "spotify"
+            "whatsapp"
+            "signal"
+            "discord"
+            # rice
+            # need stats and raycast?
+            # what WM? yabai, aerospace, dinky
+            # what launcher? raycast, tuna
+            # "kindavim"
+            # "FelixKratz/borders" # jankyborders
+            # "FelixKratz/sketchybar" # how to add tap?
             # "stats"
-            # "raycast"
-            # "proton-mail"
-            # "proton-pass"
-            # "proton-vpn"
-            # "audacity"
-            # "obsidian"
-            # "utm"
+            # how to do keyboard remaps and stuff (currently karabiner)
           ];
         };
       }

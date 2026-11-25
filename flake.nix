@@ -32,6 +32,11 @@
       url = "github:notashelf/nvf";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # apex brand/: the wallpapers (system/macos.nix)
+    apex = {
+      url = "github:bfeitknecht/apex";
+      flake = false;
+    };
     # Rex (Superlogical), prebuilt; stable has no release yet
     rex = {
       url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";

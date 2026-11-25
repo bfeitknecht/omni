@@ -12,19 +12,19 @@ The table is what echo has; the block below is ready to paste into
 `anti.nix` (inside the module, next to `homebrew`). Delete the lines you
 don't want.
 
-| Area           | Setting                                                                                           |
-| -------------- | ------------------------------------------------------------------------------------------------- |
-| Dock           | autohide, no delay, 0.15 s animation, left, size 42, no magnification, genie, no recent apps     |
-| Hot corners    | top right Quick Note (14), bottom right app windows (3)                                           |
-| Finder         | Quit menu item, path bar, no status bar, list view, search current folder, no extension warning, new window = Home, drives and servers on desktop |
-| Stage Manager  | off; click on wallpaper does not show the desktop; no tiling margins, no top-edge tiling         |
-| Screenshots    | to clipboard, no shadow, date in name, no thumbnail, `~/Pictures/Screenshots`                    |
-| Trackpad       | tap to click, two-finger right click, no three-finger drag, light click                          |
-| Clock          | date, weekday, seconds, AM/PM                                                                     |
-| Text           | no auto-capitalization, no autocorrect, no period shortcut, no inline prediction                 |
-| Windows        | dark mode, tabs always, window animations off, all extensions shown, double-click title = nothing |
-| Glass          | `NSGlassDiffusionSetting = 1`, desktop tinting off, blurred menu bar. **Check after the first switch**: the key is right, the value is not verified against the slider. |
-| Menu bar       | `AutoHideMenuBarOption = 3`, visible in full screen                                              |
+| Area          | Setting                                                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dock          | autohide, no delay, 0.15 s animation, left, size 42, no magnification, genie, no recent apps                                                                            |
+| Hot corners   | top right Quick Note (14), bottom right app windows (3)                                                                                                                 |
+| Finder        | Quit menu item, path bar, no status bar, list view, search current folder, no extension warning, new window = Home, drives and servers on desktop                       |
+| Stage Manager | off; click on wallpaper does not show the desktop; no tiling margins, no top-edge tiling                                                                                |
+| Screenshots   | to clipboard, no shadow, date in name, no thumbnail, `~/Pictures/Screenshots`                                                                                           |
+| Trackpad      | tap to click, two-finger right click, no three-finger drag, light click                                                                                                 |
+| Clock         | date, weekday, seconds, AM/PM                                                                                                                                           |
+| Text          | no auto-capitalization, no autocorrect, no period shortcut, no inline prediction                                                                                        |
+| Windows       | dark mode, tabs always, window animations off, all extensions shown, double-click title = nothing                                                                       |
+| Glass         | `NSGlassDiffusionSetting = 1`, desktop tinting off, blurred menu bar. **Check after the first switch**: the key is right, the value is not verified against the slider. |
+| Menu bar      | `AutoHideMenuBarOption = 3`, visible in full screen                                                                                                                     |
 
 ```nix
 system.defaults = {

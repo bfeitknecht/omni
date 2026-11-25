@@ -30,7 +30,7 @@ Long answers cost me effort. So:
   dropping data, deleting cloud or cluster resources.
 - Do not commit, push, tag or open pull requests unless I ask.
 - Do not change system configuration. My machines are declared in omni
-  (`~/Projects/omni` on devil): NixOS, nix-darwin, Home Manager. If a tool or a setting
+  (`~/Projects/omni`): NixOS, nix-darwin, Home Manager. If a tool or a setting
   is missing, tell me the change to make in omni. Do not run `nh os switch`,
   `darwin-rebuild` or `home-manager switch` unless I ask.
 
@@ -55,22 +55,22 @@ Long answers cost me effort. So:
 
 ## Defaults
 
-| Task | Use |
-| --- | --- |
-| Search text, find files | `rg`, `fd` |
-| JSON, YAML | `jq`, `yq` |
-| Version control | `git` |
-| Forgejo (`git.0xbf.ch`, my main forge) | `tea` |
-| GitHub | `gh` (my GitHub repos are mirrors of Forgejo: never push to them) |
-| GitLab | `glab` |
-| Python | `uv` (`uv run`, `uv add`, `pyproject.toml` + `uv.lock`), `ruff` (lint, format), `ty` (types) |
-| JavaScript, TypeScript | `bun` for new projects; else the package manager whose lock file exists. TypeScript `strict` |
-| Rust | `cargo`, `clippy` and `rustfmt` clean |
-| Nix | `nixfmt`, flakes only (no channels, no `nix-env`) |
-| Shell scripts | POSIX `sh` or `bash` with `set -euo pipefail`, `shellcheck` clean |
-| Secrets in repositories | `sops` with age (encrypt only; see Safety) |
-| Containers | macOS: OrbStack (`docker`). Linux: `podman` |
-| Docs and papers | Typst |
+| Task                                   | Use                                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Search text, find files                | `rg`, `fd`                                                                                   |
+| JSON, YAML                             | `jq`, `yq`                                                                                   |
+| Version control                        | `git`                                                                                        |
+| Forgejo (`git.0xbf.ch`, my main forge) | `tea`                                                                                        |
+| GitHub                                 | `gh` (my GitHub repos are mirrors of Forgejo: never push to them)                            |
+| GitLab                                 | `glab`                                                                                       |
+| Python                                 | `uv` (`uv run`, `uv add`, `pyproject.toml` + `uv.lock`), `ruff` (lint, format), `ty` (types) |
+| JavaScript, TypeScript                 | `bun` for new projects; else the package manager whose lock file exists. TypeScript `strict` |
+| Rust                                   | `cargo`, `clippy` and `rustfmt` clean                                                        |
+| Nix                                    | `nixfmt`, flakes only (no channels, no `nix-env`)                                            |
+| Shell scripts                          | POSIX `sh` or `bash` with `set -euo pipefail`, `shellcheck` clean                            |
+| Secrets in repositories                | `sops` with age (encrypt only; see Safety)                                                   |
+| Containers                             | macOS: OrbStack (`docker`). Linux: `podman`                                                  |
+| Docs and papers                        | Typst                                                                                        |
 
 Format and lint with the project's tools before you say you are done. Run the tests
 that exist.
@@ -85,4 +85,4 @@ that exist.
   fine. Write commands for me in nushell.
 - My shell history is in atuin. To find how I did something before:
   `atuin search --cmd-only <words>` (read only).
-- Repositories: `~/Projects/<name>` on devil, `~/HOME/CODE/GENESIS/<name>` on anti.
+- Repositories: `~/Projects/<name>`

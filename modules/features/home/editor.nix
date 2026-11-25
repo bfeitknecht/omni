@@ -18,6 +18,23 @@
       };
     };
 
-    programs.helix.enable = true;
+    # Zed: the app comes from the homebrew cask on darwin; HM writes only
+    # the user settings (merged into Zed's own file, so the settings UI
+    # still works). Vanilla apart from theme (features/home/theme.nix) and
+    # font. Language servers, formatters and tasks go per project in
+    # .zed/settings.json, not here.
+    programs.zed-editor = {
+      enable = true;
+      package = null;
+      userSettings = {
+        buffer_font_family = "CommitMono Nerd Font";
+        ui_font_family = ".SystemUIFont";
+        terminal.font_family = "CommitMono Nerd Font";
+        telemetry = {
+          diagnostics = false;
+          metrics = false;
+        };
+      };
+    };
   };
 }

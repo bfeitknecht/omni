@@ -7,35 +7,38 @@ this file is the order of work. Written 2026-11-25.
 The owner has a backup of everything important in the user home. Time Machine
 of the whole machine is optional (atlas `timemachine-mac`).
 
-## A. Decide before the day (agent prepares, owner picks)
+## A. The baseline (decided 2026-11-25: reset tonight)
 
-Each item ends in a commit on omni master. Nothing here is urgent alone, but
-whatever is not in `anti.nix` on the day is manual work after the reset.
+The first switch is a minimal known-good state to return to. Rice comes
+after, one piece at a time. What the baseline has:
 
-- [ ] **macOS defaults:** take the block in `MIGRATION.md` section 1 as a whole,
-      or strike lines. The agent pastes it into `anti.nix` and checks the eval.
-- [ ] **Casks:** which of the list in `MIGRATION.md` section 2 go into
-      `homebrew.casks` (`onActivation.cleanup = "zap"` removes anything not listed).
-- [ ] **App Store apps** (`homebrew.masApps`): Amphetamine, ETH Video, Sweet Home 3D?
-- [ ] **Fonts:** which Nerd Fonts (Commit Mono at least).
-- [ ] **Zed settings into nix** now, or copy `~/.config/zed` from the backup and
-      move it later.
-- [ ] **Karabiner** `karabiner.json` into omni, or copy from the backup.
-- [ ] **CLI tools:** global (`home.packages`) or per-project dev shells. Only
-      the ones you need on day one matter.
+- [x] **macOS defaults:** echo's settings, whole (`modules/system/macos.nix`).
+- [x] **Casks:** the owner's list in `anti.nix` (`onActivation.cleanup = "zap"`
+      removes anything not listed: install other apps through the list).
+- [x] **Fonts:** CommitMono Nerd Font only.
+- [x] **Zed:** vanilla, plus font and the Ghostty Builtin Light/Dark themes
+      (`features/home/{editor,theme}.nix`).
+- [x] **Colours:** shells and CLI tools use ANSI only; the frontend themes them
+      (`features/home/theme.nix`).
+- [x] **CLI tools:** carapace, lazygit, lazydocker, lazysql, yazi (bat previews),
+      uutils coreutils, vivid; helix off.
+- [x] **Wallpaper:** apex `brand/wallpaper.typ`, in `~/Pictures/Wallpapers`.
+- Later, not in the baseline: App Store apps (`homebrew.masApps` needs the App
+  Store login before the switch), Karabiner (copy `karabiner.json` from the
+  backup for now), window manager, bar, launcher, login-screen tweaks.
 
 ## B. On echo, the last hour before the reset
 
 1. **age key** `~/.config/sops/age/keys.txt` to two places off the Mac (Proton
    Pass and the home backup). It is the one key that cannot be recreated:
-   - it decrypts omni `secrets/` (ssh keys github/forgejo/tangled/devil, gpg,
-     model keys) and every infra `*.sops.yaml` (same recipient `age170rm…`);
-   - infra `talos/talosconfig` and `kubeconfig` are gitignored, but they
-     regenerate from `talos/secrets.sops.yaml` with this key
-     (`topf talosconfig`, `topf kubeconfig`).
-2. **Repos:** every repo pushed (`git status`, `git log @{u}..`). The GENESIS
-   repos are clean as of 2026-11-25. Gitignored state is only in the backup:
-   `.private/` in infra, omni, apex, exhib; `exhib/uploads/`.
+    - it decrypts omni `secrets/` (ssh keys github/forgejo/tangled/devil, gpg,
+      model keys) and every infra `*.sops.yaml` (same recipient `age170rm…`);
+    - infra `talos/talosconfig` and `kubeconfig` are gitignored, but they
+      regenerate from `talos/secrets.sops.yaml` with this key
+      (`topf talosconfig`, `topf kubeconfig`).
+2. **Repos:** every repo pushed (`git status`, `git log @{u}..`). Gitignored
+   state is only in the backup: `.private/` in infra, omni, apex, exhib;
+   `exhib/uploads/`; infra `kubeconfig` and `talos/talosconfig` regenerate.
 3. **ssh keys not in sops:** `id_ed25519`, `id_ed25519_nico`, `id_rsa`,
    `oci_console_rsa`, `soseth.config`. Check they are in the backup, or drop
    the ones you no longer use.
@@ -54,13 +57,17 @@ Follow the README bootstrap. Order and checks:
 1. Setup assistant: name the Mac `anti`, Apple ID, **FileVault on**, Touch ID.
 2. `xcode-select --install`, then the lix installer.
 3. age key back to `~/.config/sops/age/keys.txt` (mode 600).
-4. Clone omni (`~/HOME/CODE/GENESIS/omni`, the path echo used) and switch:
+4. Clone omni to `~/Projects/omni` (all repos live in `~/Projects/<name>`; nh
+   expects the flake there) and switch:
    `sudo nix run nix-darwin#darwin-rebuild -- switch --flake .#anti`, after
    that `nh darwin switch`. sops-nix writes the ssh keys and the gpg identity.
+   Log out and in once: Dock, Finder and trackpad settings apply then.
+   `wallpaper` sets the NULL wallpaper for the current appearance.
 5. Tailscale: sign in, name `anti`; remove the old `echo` node in the admin
    console. Check `ssh bf@devil` and `kubectl` over the tailnet.
-6. Clone the other repos from Forgejo (`ssh://git@git.0xbf.ch/bf/<repo>.git`),
-   then copy back the `.private/` dirs from the backup.
+6. Clone the other repos from Forgejo to `~/Projects/<repo>`
+   (`ssh://git@git.0xbf.ch/bf/<repo>.git`), then copy back the `.private/`
+   dirs from the backup.
 7. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`;
    check `kubectl get nodes`.
 8. Internal CA into the System keychain and trust it (infra AGENTS, Internal CA).

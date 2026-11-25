@@ -6,6 +6,7 @@
       git
       editor
       ghostty
+      theme
       nix
       ssh
       gpg

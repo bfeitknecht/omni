@@ -15,21 +15,21 @@ Status as of 2026-11-25. omni is the nix lane: one dendritic flake feeding the M
 1. **Age key backup** — `~/.config/sops/age/keys.txt` leaves the machine before anything else moves. sops-managed state in omni (and possibly infra) hangs off it.
 2. **Devil deploy** — the image only matters once the infra-side deploy lands (infra ROADMAP, NOW queue).
 
-## NOW — pre-reset parity (macbook)
+## NOW — echo -> anti (reset the night of 2026-11-25)
 
-Ordered; the factory reset happens only after all of these:
+The first switch is a minimal known-good baseline; rice follows one piece at a time. Runbook: `docs/RESET.md`.
 
-**This is the next push** (owner, 2026-11-25): factory reset, apply omni. The owner has a backup of everything important in the user home.
-
-- [x] **Reset runbook** — `docs/RESET.md` (2026-11-25): decisions first (section A), the last hour on echo (B), day one on anti (C).
-
-- [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before any transfer, full stop.
-- [ ] **Zed settings → nix** (layout, theme, extensions) — as little global config as possible; per-project `.zed/settings.json` for lsp/formatter/debugger/tasks.
-- [ ] **macOS defaults → nix-darwin** — echo's settings are read out (2026-11-19) into `docs/MIGRATION.md` with a ready block. Pick, paste into `anti.nix`, verify on the first `nh darwin switch`.
-- [ ] **Brewfile parity** — un-comment the casks actually in use (spotify, whatsapp, signal, orbstack, prusaslicer, stats, raycast, proton-*) so the reset restores app parity.
-- [ ] FileVault is enabled manually during the reset (not declarable via nix-darwin).
-
-Then: factory reset → bootstrap per the README runbook (lix installer → xcode-select → clone → first switch → secrets) → iterate with `nh darwin switch`.
+- [x] **Reset runbook** — `docs/RESET.md`: the baseline (A), the last hour on echo (B), day one on anti (C).
+- [x] **macOS defaults** — echo's settings whole, `modules/system/macos.nix` (every darwin host).
+- [x] **Casks** — the owner's list in `anti.nix`.
+- [x] **Zed** — vanilla + CommitMono + Ghostty Builtin Light/Dark themes (`features/home/{editor,theme}.nix`).
+- [x] **Colours** — ANSI only in shells and CLI tools (bat, delta, vivid LS_COLORS); frontends theme them (`features/home/theme.nix`).
+- [x] **Tools** — carapace, lazygit, lazydocker, lazysql, yazi (bat previews), uutils coreutils; helix off.
+- [x] **Wallpaper** — apex `brand/wallpaper.typ` (NULL, light and dark), `wallpaper` command.
+- [x] **Repos in `~/Projects/<name>`** on every host; nh flake default `~/Projects/omni`.
+- [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before the erase, full stop.
+- [ ] FileVault on in the setup assistant (not declarable).
+- [ ] After the first switch: check Liquid Glass value, Dock/Finder after a re-login, `wallpaper`.
 
 ## NEXT — devil
 
@@ -40,7 +40,7 @@ Done and live: Kata VM on rzbl, `/nix` on the PVC, Tailscale SSH only (2026-11-2
 
 ## LATER — rice & iteration (post-reset)
 
-- [ ] Rice: sketchybar, yabai, dinky, jankyborder, tuna launcher, kindavim — one piece at a time, each behind `nh darwin switch`.
+- [ ] Rice: sketchybar, yabai / aerospace / dinky, jankyborders, tuna or raycast, kindavim, karabiner into nix, App Store apps (`masApps`), login screen without the clock, a dynamic (light/dark) wallpaper — one piece at a time, each behind `nh darwin switch`.
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
 - [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same home config) before touching the real VM. Note: devil is x86_64-linux now; the microvm on the Mac is aarch64-linux.

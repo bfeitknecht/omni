@@ -26,8 +26,8 @@
       programs.nh = {
         enable = true;
         # `nh darwin switch` / `nh os switch` work bare from anywhere;
-        # hosts with the repos elsewhere override (devil: ~/Projects/omni)
-        flake = lib.mkDefault "${config.home.homeDirectory}/.config/omni";
+        # the repos live in ~/Projects/<name> on every host
+        flake = lib.mkDefault "${config.home.homeDirectory}/Projects/omni";
       };
 
       # lix everywhere: HM generates ~/.config/nix/nix.conf validated against

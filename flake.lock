@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "apex": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795611204,
+        "narHash": "sha256-pVZuylGouVxchxO6AeCtlWhnc1i9F8u6+I+nJNoLfg4=",
+        "owner": "bfeitknecht",
+        "repo": "apex",
+        "rev": "b097caaee8552e9ee5fa549363c47b3950af1c28",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bfeitknecht",
+        "repo": "apex",
+        "type": "github"
+      }
+    },
     "brew-src": {
       "flake": false,
       "locked": {
@@ -252,6 +268,7 @@
     },
     "root": {
       "inputs": {
+        "apex": "apex",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "import-tree": "import-tree",

@@ -105,10 +105,6 @@ let
             };
           };
 
-          # the genesis repos live in ~/Projects on devil (moved from ~/src,
-          # ~/.config/omni is a symlink into it); nh switches this flake bare
-          programs.nh.flake = "/home/${config.flake.username}/Projects/omni";
-
           # Two tiers. `opencode`: the hands-on agent, running here as bf
           # (its background service holds the sessions; Zed remote, Rex and
           # the TUI all reach the same ones; providers and MCP from
