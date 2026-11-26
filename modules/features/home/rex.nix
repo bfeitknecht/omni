@@ -23,9 +23,9 @@
       ];
 
       programs.rex = {
+        # the flake's package on every host, macOS too (the release zip has
+        # only the `rex` binary; the Rex app has no Homebrew cask)
         enable = true;
-        # macOS: the Rex app ships the server and the cli
-        package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
         # the server reads init.lua; devil does not list itself
         config = lib.mkIf (!config.services.rex.enable) (
           pkgs.writeText "init.lua" ''
