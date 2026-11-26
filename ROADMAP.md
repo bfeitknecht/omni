@@ -25,11 +25,11 @@ The first switch is a minimal known-good baseline; rice follows one piece at a t
 - [x] **Zed** — vanilla + CommitMono, default theme (`features/home/editor.nix`).
 - [x] **Colours** — ANSI only in shells (zsh highlighting, nushell) and CLI tools (bat, delta, vivid LS_COLORS); frontends theme them (`features/home/theme.nix`).
 - [x] **Tools** — carapace, lazygit, lazydocker, lazysql, yazi (bat previews), uutils coreutils; helix off.
-- [x] **Wallpaper** — apex `brand/wallpaper.typ` (NULL, light and dark), `wallpaper` command.
+- [x] **Wallpaper** — apex `brand/wallpaper.typ` (NULL, light and dark), set by `install.sh`.
 - [x] **Repos in `~/Projects/<name>`** on every host; nh flake default `~/Projects/omni`.
 - [ ] **Back up the age key** (`~/.config/sops/age/keys.txt`) — before the erase, full stop.
 - [ ] FileVault on in the setup assistant (not declarable).
-- [ ] After the first switch: Finder and trackpad after a re-login, `sudo` with Touch ID, `wallpaper`.
+- [ ] After the first switch: Finder and trackpad after a re-login, `sudo` with Touch ID.
 
 ## NEXT — devil
 

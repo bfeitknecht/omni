@@ -12,6 +12,7 @@
 #   6. clone omni to ~/Projects/omni
 #   7. the internal CA (certs/internal-ca.crt) into the System keychain, trusted
 #   8. the first switch: nix-darwin, home-manager, Homebrew and the casks
+#   9. the wallpaper (apex NULL, light or dark as the appearance is now)
 #
 # Options: --dry-run (print the commands, change nothing), --yes (no
 # confirmation prompt), --help. Env: OMNI_REPO (clone URL), OMNI_DIR (path).
@@ -50,7 +51,7 @@ else
 fi
 
 STEP=0
-STEPS=8
+STEPS=9
 step() { STEP=$((STEP + 1)); printf '\n%s==> [%s/%s] %s%s\n' "$BOLD$BLUE" "$STEP" "$STEPS" "$1" "$RESET"; }
 info() { printf '    %s\n' "$*"; }
 ok() { printf '    %s✓%s %s\n' "$GREEN" "$RESET" "$*"; }
@@ -126,11 +127,11 @@ manual_notice() {
       - your password for sudo (names, Lix, CA, the first switch, Homebrew casks)
       - a macOS dialog to allow the CA trust change: enter your password
       - the Xcode Command Line Tools dialog: click Install
+      - a macOS dialog to let the terminal control System Events (wallpaper)
       - the age key: paste it when asked (Proton Pass), or put it at
         $AGE_KEY before you start
     After:
       - log out and in once (Finder and trackpad settings apply then)
-      - \`wallpaper\` (allow the terminal to control System Events)
       - Tailscale app: sign in; App Store sign-in for store apps
       - docs/RESET.md section C has the rest (repos, kubeconfig, CLI logins)
 EOF
@@ -303,6 +304,28 @@ first_switch() {
   run rm -f "$system"
 }
 
+wallpaper() {
+  step "Wallpaper"
+  # The switch links the NULL wallpapers (apex) into ~/Pictures/Wallpapers.
+  # macOS has no plain setting for the desktop picture: System Events sets
+  # it. The light or dark one, as the appearance is now.
+  mode=light
+  if defaults read -g AppleInterfaceStyle 2>/dev/null | grep -q Dark; then
+    mode=dark
+  fi
+  file="$HOME/Pictures/Wallpapers/NULL-$mode.png"
+  if [ "$DRY_RUN" -eq 0 ] && [ ! -e "$file" ]; then
+    warn "$file is missing (did the switch run?): skipped."
+    return 0
+  fi
+  info "macOS asks once to let the terminal control System Events: click Allow."
+  # System Events wants the real file, not the link into the nix store
+  real="$file"
+  [ "$DRY_RUN" -eq 1 ] || real="$(readlink -f "$file")"
+  run /usr/bin/osascript -e "tell application \"System Events\" to tell every desktop to set picture to POSIX file \"$real\""
+  [ "$DRY_RUN" -eq 1 ] || ok "wallpaper: NULL-$mode"
+}
+
 done_notice() {
   printf '\n%s%s==> %s is set up.%s\n' "$BOLD" "$GREEN" "$HOST" "$RESET"
   cat <<EOF
@@ -313,9 +336,8 @@ done_notice() {
     Now:
       1. Open a new terminal (Ghostty), so the new shell and PATH load.
       2. Log out and in once.
-      3. \`wallpaper\`
-      4. Tailscale: sign in in the app (name: $HOST).
-      5. The rest: $OMNI_DIR/docs/RESET.md section C.
+      3. Tailscale: sign in in the app (name: $HOST).
+      4. The rest: $OMNI_DIR/docs/RESET.md section C.
 EOF
 }
 
@@ -348,6 +370,7 @@ main() {
   clone
   internal_ca
   first_switch
+  wallpaper
   done_notice
 }
 

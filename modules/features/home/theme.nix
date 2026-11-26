@@ -22,10 +22,13 @@
         $env.LS_COLORS = (^${pkgs.vivid}/bin/vivid generate ansi)
       '';
 
-      # The command line in both shells, same roles as bat and Zed: keywords
-      # magenta (5), commands blue (4), strings green (2), numbers and options
-      # cyan (6), comments and hints bright black (8), errors red (1), the
-      # rest the terminal's foreground. Numbers are ANSI indices, never hex.
+      # The command line in both shells: zsh-syntax-highlighting's own
+      # defaults, as ANSI indices (never hex), and nushell set to look the
+      # same. A command shows red and bold (1) while it is unknown or
+      # incomplete, and green (2) as soon as it exists. Keywords, strings
+      # and redirections yellow (3), globs blue (4), variables in strings
+      # cyan (6), paths underlined, comments and hints bright black (8),
+      # the rest the terminal's foreground.
       #
       # zsh: zsh-syntax-highlighting and zsh-autosuggestions (zimfw). Set
       # after zimfw's init (order 1500 > the default 1000 in shell.nix).
@@ -34,36 +37,36 @@
         ZSH_HIGHLIGHT_STYLES=(
           default                       none
           unknown-token                 fg=1,bold
-          reserved-word                 fg=5
-          alias                         fg=4
-          suffix-alias                  fg=4
-          global-alias                  fg=4
-          builtin                       fg=4
-          function                      fg=4
-          command                       fg=4
-          precommand                    fg=4,underline
-          hashed-command                fg=4
-          arg0                          fg=4
-          autodirectory                 fg=4,underline
+          reserved-word                 fg=3
+          alias                         fg=2
+          suffix-alias                  fg=2,underline
+          global-alias                  fg=6
+          builtin                       fg=2
+          function                      fg=2
+          command                       fg=2
+          precommand                    fg=2,underline
+          hashed-command                fg=2
+          arg0                          fg=2
+          autodirectory                 fg=2,underline
           commandseparator              none
-          redirection                   none
+          redirection                   fg=3
           path                          underline
           path_pathseparator            underline
           path_prefix                   underline
-          globbing                      fg=6
-          history-expansion             fg=6
-          single-hyphen-option          fg=6
-          double-hyphen-option          fg=6
-          single-quoted-argument        fg=2
-          double-quoted-argument        fg=2
-          dollar-quoted-argument        fg=2
-          back-quoted-argument          fg=5
+          globbing                      fg=4
+          history-expansion             fg=4
+          single-hyphen-option          none
+          double-hyphen-option          none
+          single-quoted-argument        fg=3
+          double-quoted-argument        fg=3
+          dollar-quoted-argument        fg=3
+          back-quoted-argument          none
           rc-quote                      fg=6
           dollar-double-quoted-argument fg=6
           back-double-quoted-argument   fg=6
           back-dollar-quoted-argument   fg=6
-          command-substitution-delimiter fg=5
-          process-substitution-delimiter fg=5
+          command-substitution-delimiter none
+          process-substitution-delimiter none
           assign                        none
           named-fd                      none
           numeric-fd                    none
@@ -75,28 +78,32 @@
       '';
 
       # nushell: the shapes (command line) and the value colours (tables),
-      # in named ANSI colours. dark_gray is bright black (8).
+      # in named ANSI colours. dark_gray is bright black (8). Resolved
+      # externals get their own shape, so an unknown command stays red.
       programs.nushell.extraConfig = lib.mkOrder 500 ''
+        $env.config.highlight_resolved_externals = true
         $env.config.color_config = ($env.config.color_config | merge {
-          shape_keyword: magenta
-          shape_internalcall: blue
-          shape_external: blue
+          shape_garbage: { fg: red attr: b }
+          shape_external: { fg: red attr: b }
+          shape_external_resolved: green
+          shape_internalcall: green
+          shape_custom: green
+          shape_keyword: yellow
           shape_externalarg: default
-          shape_custom: blue
-          shape_garbage: { fg: default bg: red attr: b }
-          shape_string: green
+          shape_string: yellow
           shape_string_interpolation: cyan
-          shape_raw_string: green
-          shape_int: cyan
-          shape_float: cyan
-          shape_bool: cyan
-          shape_nothing: cyan
-          shape_binary: cyan
-          shape_datetime: cyan
+          shape_raw_string: yellow
+          shape_redirection: yellow
+          shape_int: default
+          shape_float: default
+          shape_bool: default
+          shape_nothing: default
+          shape_binary: default
+          shape_datetime: default
           shape_filepath: { attr: u }
           shape_directory: { attr: u }
-          shape_globpattern: cyan
-          shape_flag: cyan
+          shape_globpattern: blue
+          shape_flag: default
           shape_operator: default
           shape_pipe: default
           shape_variable: default

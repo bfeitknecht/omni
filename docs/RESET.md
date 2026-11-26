@@ -26,7 +26,7 @@ after, one piece at a time. What the baseline has:
       (`features/home/theme.nix`).
 - [x] **CLI tools:** carapace, lazygit, lazydocker, lazysql, yazi (bat previews),
       uutils coreutils, vivid; helix off.
-- [x] **Wallpaper:** apex `brand/wallpaper.typ`, in `~/Pictures/Wallpapers`.
+- [x] **Wallpaper:** apex `brand/wallpaper.typ`, in `~/Pictures/Wallpapers`; `install.sh` sets it.
 - Later, not in the baseline: App Store apps (`homebrew.masApps` needs the App
   Store login before the switch), Karabiner (copy `karabiner.json` from the
   backup for now), window manager, bar, launcher, login-screen tweaks.
@@ -68,8 +68,7 @@ after, one piece at a time. What the baseline has:
    It installs the Xcode Command Line Tools, Lix, the age key, clones omni to
    `~/Projects/omni` (all repos live in `~/Projects/<name>`) and runs the
    first switch. sops-nix writes the ssh keys and the gpg identity.
-3. Open Ghostty, log out and in once (Finder and trackpad apply then), run
-   `wallpaper`.
+3. Open Ghostty, log out and in once (Finder and trackpad apply then).
 4. Tailscale: sign in, name `anti`; remove the old `echo` node in the admin
    console. Check `ssh bf@devil` and `kubectl` over the tailnet.
 5. Clone the other repos from Forgejo to `~/Projects/<repo>`

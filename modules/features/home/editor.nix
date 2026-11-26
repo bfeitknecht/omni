@@ -35,6 +35,9 @@
       programs.zed-editor = {
         enable = true;
         package = null;
+        # always there: Nix syntax and the nil language server (nil itself
+        # comes from each project's dev shell, through direnv)
+        extensions = [ "nix" ];
         userSettings = {
           buffer_font_family = "CommitMono Nerd Font";
           ui_font_family = ".SystemUIFont";
