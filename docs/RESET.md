@@ -19,8 +19,8 @@ after, one piece at a time. What the baseline has:
 - [x] **Casks:** the owner's list in `anti.nix` (`onActivation.cleanup = "zap"`
       removes anything not listed: install other apps through the list).
 - [x] **Fonts:** CommitMono Nerd Font only.
-- [x] **Zed:** vanilla, plus font and the Ghostty Builtin Light/Dark themes
-      (`features/home/{editor,theme}.nix`).
+- [x] **Zed:** vanilla, plus font, default theme
+      (`features/home/editor.nix`).
 - [x] **Colours:** shells (zsh highlighting and suggestions, nushell shapes and
       tables) and CLI tools use ANSI only; the frontend themes them
       (`features/home/theme.nix`).

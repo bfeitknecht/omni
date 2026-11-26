@@ -31,7 +31,7 @@ in
             "orbstack"
             "utm"
             ## security
-            "tailscale-app" # the tailnet: devil, the cluster, kubectl
+            "tailscale-app"
             "proton-mail"
             "proton-pass"
             "protonvpn"
@@ -53,6 +53,8 @@ in
             # "FelixKratz/sketchybar" # how to add tap?
             # "stats"
             # how to do keyboard remaps and stuff (currently karabiner)
+            # hammerspoon
+            # skbd
           ];
         };
       }

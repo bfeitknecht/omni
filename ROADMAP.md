@@ -22,7 +22,7 @@ The first switch is a minimal known-good baseline; rice follows one piece at a t
 - [x] **Reset runbook** — `docs/RESET.md`: the baseline (A), the last hour on echo (B), day one on anti (C).
 - [x] **macOS settings** — function only (Finder Quit, screenshots, trackpad, typing, Touch ID sudo), `modules/system/macos.nix`. Dock, menu bar, look: iterate after the reset (echo's set in `docs/MIGRATION.md`).
 - [x] **Casks** — the owner's list in `anti.nix`.
-- [x] **Zed** — vanilla + CommitMono + Ghostty Builtin Light/Dark themes (`features/home/{editor,theme}.nix`).
+- [x] **Zed** — vanilla + CommitMono, default theme (`features/home/editor.nix`).
 - [x] **Colours** — ANSI only in shells (zsh highlighting, nushell) and CLI tools (bat, delta, vivid LS_COLORS); frontends theme them (`features/home/theme.nix`).
 - [x] **Tools** — carapace, lazygit, lazydocker, lazysql, yazi (bat previews), uutils coreutils; helix off.
 - [x] **Wallpaper** — apex `brand/wallpaper.typ` (NULL, light and dark), `wallpaper` command.
