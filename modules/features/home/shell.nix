@@ -117,6 +117,9 @@
         };
 
         initContent = ''
+          # no space after the right prompt (zsh keeps one column free by default)
+          ZLE_RPROMPT_INDENT=0
+
           ZIM_CONFIG_FILE="${config.xdg.configHome}/zsh/zimrc"
           ZIM_HOME="${config.xdg.cacheHome}/zsh/zim"
           # installs missing modules and (re)builds init.zsh when outdated
@@ -221,26 +224,17 @@
         '';
       };
 
-      # seed the user module once; HM never owns it afterwards, so runtime
-      # edits in ~/.config/nushell/user/ survive switches
+      # config.nu does `use user *`: an empty mod.nu when there is none. HM
+      # never owns it, so runtime edits in ~/.config/nushell/user/ survive
+      # switches. Early in the activation: a later failing step must not
+      # leave nushell without it.
       home.activation.omniNushellUserModule =
-        let
-          userMod = pkgs.writeText "omni-nushell-user-mod" ''
-            # omni user module — imported by config.nu (`use user *`).
-            # Created once by home-manager; never overwritten.
-            #
-            #   env vars / config : export-env { $env.FOO = "bar" }
-            #   functions         : export def greet [] { "hi" }
-            #   aliases           : export alias ll = eza -la --icons
-            #   constants         : export const editor = "nvim"
-            #   split into files  : create user/foo.nu, then here: export use ./foo.nu
+        lib.hm.dag.entryBetween [ "linkGeneration" ] [ "writeBoundary" ]
+          ''
+            run mkdir -p "${config.xdg.configHome}/nushell/user"
+            [ -e "${config.xdg.configHome}/nushell/user/mod.nu" ] || \
+              run touch "${config.xdg.configHome}/nushell/user/mod.nu"
           '';
-        in
-        lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-          mkdir -p "${config.xdg.configHome}/nushell/user"
-          [ -e "${config.xdg.configHome}/nushell/user/mod.nu" ] || \
-            install -m 644 ${userMod} "${config.xdg.configHome}/nushell/user/mod.nu"
-        '';
 
       # f to correct the previous command
       programs.pay-respects = {
@@ -274,5 +268,34 @@
         # atuin rewrites config.toml itself; let HM own the file
         forceOverwriteSettings = true;
       };
+
+      # atuin sync login from sops: atuin/key is the key file
+      # (~/.local/share/atuin/key, base64), atuin/password the account
+      # password. atuin reads the key from the sops path. The session token
+      # lives in atuin's own store, so the login runs at activation; when
+      # already logged in, atuin returns at once and reads nothing.
+      sops.secrets."atuin/key" = { };
+      sops.secrets."atuin/password" = { };
+      programs.atuin.settings.key_path = config.sops.secrets."atuin/key".path;
+
+      home.activation.atuinLogin =
+        let
+          atuin = lib.getExe config.programs.atuin.package;
+          key = config.sops.secrets."atuin/key".path;
+          password = config.sops.secrets."atuin/password".path;
+        in
+        lib.hm.dag.entryAfter [ "sopsSecretsWait" "linkGeneration" ] ''
+          if waitForSecret ${key} && waitForSecret ${password}; then
+            if [[ -v DRY_RUN ]]; then
+              echo "${atuin} login --username bf --password - --key \"\" < ${password}"
+            elif ! atuinOut=$(${atuin} login --username bf --password - --key "" < ${password} 2>&1); then
+              warnEcho "atuin: login failed (no network?). Switch again, or: atuin login"
+              warnEcho "$atuinOut"
+            fi
+            unset atuinOut
+          else
+            warnEcho "atuin: the sops secrets are missing, not logged in. Switch again when sops-nix has run."
+          fi
+        '';
     };
 }

@@ -34,6 +34,10 @@
       shell = pkgs.zsh;
     };
 
+    # ssh from Ghostty sends TERM=xterm-ghostty; without its terminfo, zle
+    # has no terminal definition (broken echo, broken line editing)
+    environment.systemPackages = [ pkgs.ghostty.terminfo ];
+
     programs.zsh.enable = true;
     # zim's completion module owns compinit (shell.nix) — the NixOS
     # /etc/zshrc must not run it first

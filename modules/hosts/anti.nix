@@ -9,7 +9,10 @@ in
       { imports = [ config.flake.modules.darwin.default ]; }
       inputs.nix-homebrew.darwinModules.nix-homebrew
       {
+        # all three macOS names (HostName sets LocalHostName too);
+        # install.sh sets them before the first switch
         networking.hostName = "anti";
+        networking.computerName = "anti";
 
         # nix-darwin installs and owns Homebrew itself;
         # the homebrew block below manages only what the Brewfile lists
@@ -22,26 +25,26 @@ in
           enable = true;
           onActivation.cleanup = "zap";
           casks = [
-            # development
+            ## development
             "zed"
             "ghostty"
             "orbstack"
             "utm"
-            # security
+            ## security
             "tailscale-app" # the tailnet: devil, the cluster, kubectl
             "proton-mail"
             "proton-pass"
-            "proton-vpn"
+            "protonvpn"
             # creating
             "obsidian"
             "prusaslicer"
             "audacity"
-            # communication
+            ## communication
             "spotify"
             "whatsapp"
             "signal"
             "discord"
-            # rice
+            ## rice
             # need stats and raycast?
             # what WM? yabai, aerospace, dinky
             # what launcher? raycast, tuna

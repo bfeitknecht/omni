@@ -57,7 +57,7 @@ after, one piece at a time. What the baseline has:
 ## C. Day one on anti
 
 1. Setup assistant: Apple ID, **FileVault on**, Touch ID. The name does not
-   matter: the switch sets it to `anti`.
+   matter: `install.sh` sets it to `anti`.
 2. In Terminal.app, one command (have the age key from Proton Pass ready to
    paste; the script asks for it):
 
@@ -77,8 +77,10 @@ after, one piece at a time. What the baseline has:
    dirs from the backup.
 6. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`;
    check `kubectl get nodes`.
-7. Internal CA into the System keychain and trust it (infra AGENTS, Internal CA).
-8. atuin: `atuin login` with the saved key, `atuin sync`.
+7. Internal CA: `install.sh` trusts `certs/internal-ca.crt`. Check that it is
+   trusted: `security verify-cert -c ~/Projects/omni/certs/internal-ca.crt`.
+8. atuin: the switch logs in from sops (`atuin/key`, `atuin/password`). Check
+   with `atuin status`, then `atuin sync`.
 9. CLI logins: `gh`, `tea`, `glab` (atlas `cli-logins`).
 10. Manual rest (`MIGRATION.md` section 3): App Store login, Mail accounts,
     Swiss German input, login items, licences, Rex Beta + remote `devil`,

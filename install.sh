@@ -5,11 +5,13 @@
 #
 # Steps (each is skipped when it is already done, so a re-run is safe):
 #   1. checks: macOS on Apple silicon, not root, a known host, network
-#   2. Xcode Command Line Tools (git, compilers; Homebrew needs them)
-#   3. Lix, the nix implementation omni uses (its own installer, verbatim)
-#   4. the age key (~/.config/sops/age/keys.txt), for omni's secrets
-#   5. clone omni to ~/Projects/omni
-#   6. the first switch: nix-darwin, home-manager, Homebrew and the casks
+#   2. the Mac's names (ComputerName, HostName, LocalHostName) to the host
+#   3. Xcode Command Line Tools (git, compilers; Homebrew needs them)
+#   4. Lix, the nix implementation omni uses (its own installer, verbatim)
+#   5. the age key (~/.config/sops/age/keys.txt), for omni's secrets
+#   6. clone omni to ~/Projects/omni
+#   7. the internal CA (certs/internal-ca.crt) into the System keychain, trusted
+#   8. the first switch: nix-darwin, home-manager, Homebrew and the casks
 #
 # Options: --dry-run (print the commands, change nothing), --yes (no
 # confirmation prompt), --help. Env: OMNI_REPO (clone URL), OMNI_DIR (path).
@@ -23,6 +25,9 @@ OMNI_REPO="${OMNI_REPO:-https://github.com/bfeitknecht/omni.git}"
 OMNI_DIR="${OMNI_DIR:-$HOME/Projects/omni}"
 LIX_URL="https://install.lix.systems/lix"
 AGE_KEY="$HOME/.config/sops/age/keys.txt"
+# the cluster's CA for *.internal (public certificate, in the repository)
+CA_CERT="certs/internal-ca.crt"
+SYSTEM_KEYCHAIN=/Library/Keychains/System.keychain
 TMP="${TMPDIR:-/tmp}"
 TMP="${TMP%/}"
 NIX_BIN=/nix/var/nix/profiles/default/bin
@@ -45,7 +50,7 @@ else
 fi
 
 STEP=0
-STEPS=6
+STEPS=8
 step() { STEP=$((STEP + 1)); printf '\n%s==> [%s/%s] %s%s\n' "$BOLD$BLUE" "$STEP" "$STEPS" "$1" "$RESET"; }
 info() { printf '    %s\n' "$*"; }
 ok() { printf '    %s✓%s %s\n' "$GREEN" "$RESET" "$*"; }
@@ -116,9 +121,10 @@ manual_notice() {
     Before (setup assistant, already done if you are reading this):
       - Apple ID / iCloud sign-in, Touch ID
       - FileVault on (System Settings > Privacy & Security)
-      - the Mac's name does not matter: the switch sets it to '$HOST'
+      - the Mac's name does not matter: this script sets it to '$HOST'
     During this script:
-      - your password for sudo (Lix, the first switch, Homebrew casks)
+      - your password for sudo (names, Lix, CA, the first switch, Homebrew casks)
+      - a macOS dialog to allow the CA trust change: enter your password
       - the Xcode Command Line Tools dialog: click Install
       - the age key: paste it when asked (Proton Pass), or put it at
         $AGE_KEY before you start
@@ -126,8 +132,23 @@ manual_notice() {
       - log out and in once (Finder and trackpad settings apply then)
       - \`wallpaper\` (allow the terminal to control System Events)
       - Tailscale app: sign in; App Store sign-in for store apps
-      - docs/RESET.md section C has the rest (repos, kubeconfig, CA, CLI logins)
+      - docs/RESET.md section C has the rest (repos, kubeconfig, CLI logins)
 EOF
+}
+
+host_names() {
+  step "Names: $HOST"
+  # ComputerName (Sharing, AirDrop), HostName (the shell), LocalHostName
+  # (Bonjour, $HOST.local). The switch sets them too (anti.nix), but only
+  # when it gets that far.
+  for name in ComputerName HostName LocalHostName; do
+    if [ "$(scutil --get "$name" 2>/dev/null || true)" = "$HOST" ]; then
+      ok "$name: $HOST"
+    else
+      run sudo scutil --set "$name" "$HOST"
+      [ "$DRY_RUN" -eq 1 ] || ok "$name: $HOST"
+    fi
+  done
 }
 
 xcode_tools() {
@@ -226,6 +247,26 @@ clone() {
   fi
 }
 
+internal_ca() {
+  step "Internal CA (*.internal)"
+  cert="$OMNI_DIR/$CA_CERT"
+  if [ "$DRY_RUN" -eq 0 ]; then
+    if [ ! -s "$cert" ]; then
+      warn "$CA_CERT is not in the repository: skipped. Add it, then run this script again."
+      return 0
+    fi
+    info "$(openssl x509 -in "$cert" -noout -subject -fingerprint -sha256)"
+    if security verify-cert -L -q -c "$cert" >/dev/null 2>&1; then
+      ok "already trusted"
+      return 0
+    fi
+  fi
+  info "Adds the CA to the System keychain and trusts it as a root (it can"
+  info "only sign .internal names). macOS asks for your password in a dialog."
+  run sudo security add-trusted-cert -d -r trustRoot -k "$SYSTEM_KEYCHAIN" "$cert"
+  [ "$DRY_RUN" -eq 1 ] || ok "trusted: $CA_CERT"
+}
+
 first_switch() {
   step "First switch: nix-darwin, home-manager, Homebrew"
   info "Builds the whole system (several GB on a fresh machine), then activates it."
@@ -300,10 +341,12 @@ main() {
   printf '\n'
   ask "Start? This installs Lix and Homebrew and changes system settings." || die "stopped, nothing changed."
 
+  host_names
   xcode_tools
   lix
   age_key
   clone
+  internal_ca
   first_switch
   done_notice
 }

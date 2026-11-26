@@ -169,10 +169,11 @@ curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh 
 ```
 
 `install.sh` checks the machine (macOS, Apple silicon, not root, a known
-host, network, FileVault), lists the manual steps, then installs the Xcode
-Command Line Tools, Lix (its own installer, with its own output), asks for
-the age key (hidden input) if `~/.config/sops/age/keys.txt` is missing,
-clones omni to `~/Projects/omni` and runs the first switch with the
+host, network, FileVault), lists the manual steps, then sets the Mac's names,
+installs the Xcode Command Line Tools, Lix (its own installer, with its own
+output), asks for the age key (hidden input) if `~/.config/sops/age/keys.txt`
+is missing, clones omni to `~/Projects/omni`, trusts the internal CA
+(`certs/internal-ca.crt`, System keychain) and runs the first switch with the
 nix-darwin that `flake.lock` pins. Each step is skipped when it is done, so a
 re-run is safe. `--dry-run` prints the commands without running them.
 
