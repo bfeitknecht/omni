@@ -11,6 +11,9 @@
           # follow the system appearance
           theme = "light:Builtin Light,dark:Builtin Dark";
           font-family = "CommitMono Nerd Font";
+          # ssh: install xterm-ghostty's terminfo on the remote host when it
+          # has none, else fall back to TERM=xterm-256color
+          shell-integration-features = "ssh-terminfo,ssh-env";
         };
       };
 

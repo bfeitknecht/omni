@@ -187,41 +187,84 @@
         extraEnv = ''
           $env.STARSHIP_CONFIG = ($nu.default-config-dir | path dirname | path join "starship" "starship.toml")
         '';
-        extraConfig = ''
-          $env.STARSHIP_SHELL = "nu"
-          $env.config.render_right_prompt_on_last_line = false
+        extraConfig = lib.mkMerge [
+          ''
+            $env.STARSHIP_SHELL = "nu"
+            $env.config.render_right_prompt_on_last_line = false
 
-          # The prompt is monochrome in both shells, red on error aside:
-          # starship sets no other style,
-          # and nushell's own prompt colours (reedline paints the prompt
-          # green, the indicators cyan) are cancelled by a reset at the start
-          # of every prompt string. Colour on the command line is theme.nix.
-          let reset = (ansi reset)
+            # The prompt is monochrome in both shells, red on error aside:
+            # starship sets no other style,
+            # and nushell's own prompt colours (reedline paints the prompt
+            # green, the indicators cyan) are cancelled by a reset at the start
+            # of every prompt string. Colour on the command line is theme.nix.
+            let reset = (ansi reset)
 
-          $env.PROMPT_COMMAND = { ||
-            # compact in Zed and Rex (REX_SESSION is set in every Rex block)
-            if ('ZED_TERM' in $env or 'REX_SESSION' in $env) {
-              $reset
-            } else {
-              $reset ++ (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
+            $env.PROMPT_COMMAND = { ||
+              # compact in Zed and Rex (REX_SESSION is set in every Rex block)
+              if ('ZED_TERM' in $env or 'REX_SESSION' in $env) {
+                $reset
+              } else {
+                $reset ++ (^${pkgs.starship}/bin/starship module custom.prompt) ++ "\n"
+              }
             }
-          }
-          $env.PROMPT_COMMAND_RIGHT = { ||
-            $reset ++ (^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)")
-          }
+            $env.PROMPT_COMMAND_RIGHT = { ||
+              $reset ++ (^${pkgs.starship}/bin/starship prompt --right $"--status=($env.LAST_EXIT_CODE)")
+            }
 
-          $env.PROMPT_INDICATOR = $reset
-          $env.PROMPT_INDICATOR_VI_NORMAL = $"($reset)$ "
-          $env.PROMPT_INDICATOR_VI_INSERT = $"($reset): "
-          $env.PROMPT_MULTILINE_INDICATOR = $"($reset)... "
+            $env.PROMPT_INDICATOR = $reset
+            $env.PROMPT_INDICATOR_VI_NORMAL = $"($reset)$ "
+            $env.PROMPT_INDICATOR_VI_INSERT = $"($reset): "
+            $env.PROMPT_MULTILINE_INDICATOR = $"($reset)... "
 
-          $env.TRANSIENT_PROMPT_COMMAND = { || $reset }
-          $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || $reset }
-          $env.TRANSIENT_PROMPT_INDICATOR = $"($reset)$"
-          $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = $"($reset)    "
+            $env.TRANSIENT_PROMPT_COMMAND = { || $reset }
+            $env.TRANSIENT_PROMPT_COMMAND_RIGHT = { || $reset }
+            $env.TRANSIENT_PROMPT_INDICATOR = $"($reset)$"
+            $env.TRANSIENT_PROMPT_MULTILINE_INDICATOR = $"($reset)    "
 
-          use user *
-        '';
+            use user *
+          ''
+          # HM's direnv hook, with direnv's messages captured and printed instead
+          (lib.mkAfter ''
+            $env.config = ($env.config? | default {})
+            $env.config.hooks = ($env.config.hooks? | default {})
+            $env.config.hooks.pre_prompt = (
+                $env.config.hooks.pre_prompt?
+                | default []
+                | append {||
+                    let result = (^${lib.getExe config.programs.direnv.package} export json | complete)
+                    if ($result.stderr | is-not-empty) {
+                        print --stderr --no-newline $result.stderr
+                    }
+                    let direnv = ($result.stdout | from json --strict | default {})
+
+                    for key in ($direnv | columns) {
+                        if ($direnv | get $key) == null {
+                            hide-env --ignore-errors $key
+                        }
+                    }
+
+                    $direnv
+                    | items {|key, value|
+                        let value = do (
+                            {
+                              "PATH": {
+                                from_string: {|s| $s | split row (char esep) | path expand --no-symlink }
+                                to_string: {|v| $v | path expand --no-symlink | str join (char esep) }
+                              }
+                            }
+                            | merge ($env.ENV_CONVERSIONS? | default {})
+                            | get ([[value, optional, insensitive]; [$key, true, true] [from_string, true, false]] | into cell-path)
+                            | if ($in | is-empty) { {|x| $x} } else { $in }
+                        ) $value
+                        return [ $key $value ]
+                    }
+                    | where {|pair| $pair.1 != null }
+                    | into record
+                    | load-env
+                }
+            )
+          '')
+        ];
       };
 
       # config.nu does `use user *`: an empty mod.nu when there is none. HM
@@ -251,6 +294,9 @@
       programs.direnv = {
         enable = true;
         nix-direnv.enable = true;
+        # HM's nushell hook redirects to /dev/stderr; when stderr is a pipe
+        # (Zed's remote terminal) nushell cannot open it. Own hook in programs.nushell.
+        enableNushellIntegration = false;
       };
 
       programs.atuin = {
