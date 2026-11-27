@@ -11,7 +11,8 @@ Long answers cost me effort. So:
 - Write ASD-STE100 Simplified Technical English everywhere: answers, comments, commit
   messages, docs. Short sentences. One instruction per sentence. Active voice.
 - No LLM speak: no praise, no filler, no "Great question", no "Let me", no summaries
-  of what you are about to do. No emoji.
+  of what you are about to do. No emoji. No "it is not X, it is Y" contrasts: say
+  what it is.
 - Put the result first. Then the important details as a short list. Stop.
 - Use headings and lists only when they help to scan. Tables for comparisons.
 - When you are not sure what I want, ask at once. Ask one short question with 2 to 4
@@ -34,6 +35,20 @@ Long answers cost me effort. So:
   is missing, tell me the change to make in omni. Do not run `nh os switch`,
   `darwin-rebuild` or `home-manager switch` unless I ask.
 
+## Keep it simple
+
+- Solve the problem the simple way, with the least new code. Do not overengineer.
+- Read the code you change first. Find every place the change must reach.
+- Take the first option that fully works: not needed at all, then what the project
+  already has, then the standard library, then a dependency the project already has,
+  then the minimum new code.
+- Deleting code beats adding code. No abstraction, wrapper, option or config "for
+  later". Three similar lines are better than a premature helper.
+- Fix a bug at its root, once. Check all callers first.
+- Be lazy about the solution, not about the change: finish it, test it, clean up.
+- Never cut input checks at trust boundaries, error handling that prevents data loss,
+  or security.
+
 ## Keep things clean
 
 - Scratch work goes in `/tmp` (a new directory per task: `mktemp -d`). Never in `$HOME`,
@@ -41,6 +56,12 @@ Long answers cost me effort. So:
 - Write only inside the project you work on. Build output and caches go in
   `.gitignore`d paths.
 - Add a dependency only when it earns its place. Prefer the standard library. Say why.
+- Clean up after yourself: delete your scratch directories, stop the processes and Rex
+  sessions you started, and delete your own branches after their merge. Ask before
+  you delete anything that you did not make.
+- Languages, language servers, formatters and tasks that only one project uses go in
+  that project: tools in its `flake.nix`, Zed settings in its `.zed/settings.json`.
+  The global config stays small.
 
 ## Tools come from Nix flakes
 
@@ -60,8 +81,8 @@ Long answers cost me effort. So:
 | Search text, find files                | `rg`, `fd`                                                                                   |
 | JSON, YAML                             | `jq`, `yq`                                                                                   |
 | Version control                        | `git`                                                                                        |
-| Forgejo (`git.0xbf.ch`, my main forge) | `tea`                                                                                        |
-| GitHub                                 | `gh` (my GitHub repos are mirrors of Forgejo: never push to them)                            |
+| GitHub (my main forge)                 | `gh`                                                                                         |
+| Forgejo (`git.0xbf.ch`)                | `tea` (my Forgejo repos are mirrors of GitHub: never push to them)                           |
 | GitLab                                 | `glab`                                                                                       |
 | Python                                 | `uv` (`uv run`, `uv add`, `pyproject.toml` + `uv.lock`), `ruff` (lint, format), `ty` (types) |
 | JavaScript, TypeScript                 | `bun` for new projects; else the package manager whose lock file exists. TypeScript `strict` |
@@ -81,6 +102,9 @@ that exist.
   box, reached as `ssh bf@devil` over Tailscale). My cluster is the `infra` repository.
 - Long-running processes (servers, watchers, builds that take minutes) go in a Rex
   session, not in the background of your shell. Use the `rex` skill and the `rex` CLI.
+- Rex also reaches my other machines (`ssh://devil`, `ssh://anti`): run, watch and
+  type into sessions there as if they were local. Use it for remote work instead of
+  one-shot `ssh` commands. (Inside the agent sandbox on devil, Rex is not available.)
 - My shells: nushell (interactive), zsh (login). Your own commands run in bash; that is
   fine. Write commands for me in nushell.
 - My shell history is in atuin. To find how I did something before:
