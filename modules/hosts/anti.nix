@@ -14,6 +14,13 @@ in
         networking.hostName = "anti";
         networking.computerName = "anti";
 
+        # Tailscale: the open-source tailscaled (launchd daemon), not the
+        # app: only this variant runs a Tailscale SSH server on macOS, so
+        # `ssh anti` and Rex `ssh://anti` work from devil and the phone. No
+        # menu bar icon; the CLI is `tailscale`. First start, once:
+        # `sudo tailscale up --ssh --accept-routes --advertise-tags=tag:anti`.
+        services.tailscale.enable = true;
+
         # nix-darwin installs and owns Homebrew itself;
         # the homebrew block below manages only what the Brewfile lists
         nix-homebrew = {
@@ -31,7 +38,6 @@ in
             "orbstack"
             "utm"
             ## security
-            "tailscale-app"
             "proton-mail"
             "proton-pass"
             "protonvpn"

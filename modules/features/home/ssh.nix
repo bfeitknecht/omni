@@ -62,10 +62,13 @@
           identityFile = "~/.ssh/tangled";
         };
 
-        # Tailscale SSH (devil's own tailnet node; no key, the tailnet
-        # policy decides). Zed remote, Rex and `oc` use it.
-        settings."devil" = {
+        # Tailscale SSH on both machines (no key, no sshd: the tailnet policy
+        # decides). Zed remote and Rex (ssh://devil, ssh://anti) use it.
+        # `tailscale nc` reaches the node through tailscaled, so no MagicDNS
+        # and no tun device are needed (devil has neither).
+        settings."devil anti" = {
           user = config.home.username;
+          proxyCommand = "${lib.getExe pkgs.tailscale} nc %h %p";
         };
 
       };

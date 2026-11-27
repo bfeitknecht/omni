@@ -149,7 +149,7 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
 │       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
-│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil over Tailscale SSH), no agent forwarding
+│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil and anti over Tailscale SSH via tailscale nc), no agent forwarding
 │       ├── rex.nix       Rex CLI everywhere (the flake's package, macOS too); init.lua lists devil (ssh://devil)
 │       ├── agents.nix    agents.md for opencode and Claude Code (~/.config/claude), model keys from sops
 │       ├── xdg.nix       tools moved out of ~ (kube, npm, vibe, atuin logs, nix profile links)
@@ -243,8 +243,10 @@ booted pod: clone omni, `nh os switch .#devil` — day-to-day
 updates never touch the image. Access is tailnet only, no sshd (since
 2026-11-24): **ssh** is Tailscale SSH on devil's own node `devil` (`ssh bf@devil`,
 no key: the tailnet policy admits bf's own Macs and phones; Zed remote and ish
-use it too) and **Rex** (sessions on the VM's personal Rex server, tailnet node
-`deviler`). Break-glass: `kubectl exec` into the pod. No browser terminal: the
+use it too) and **Rex** (sessions on the VM's personal Rex server, over the same
+Tailscale SSH: `ssh://devil`; no Rex tailnet node since 2026-11-27). anti runs
+Tailscale SSH too (`ssh anti`, `ssh://anti`; the open-source tailscaled).
+Break-glass: `kubectl exec` into the pod. No browser terminal: the
 ghostty-web page was removed 2026-11-20.
 
 ## deferred

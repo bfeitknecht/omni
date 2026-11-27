@@ -7,7 +7,9 @@
 #     back read-only), the gpg agent and a forwarded ssh agent;
 #   - the ways out of the sandbox: the systemd user manager and the D-Bus
 #     session bus (systemd-run --user), the Rex server (its sessions run
-#     outside), the Rex identity;
+#     outside), the Rex identity, tailscaled (its socket is the only way
+#     into the tailnet: devil has no tun; Tailscale SSH to anti trusts
+#     the node, not a key);
 #   - persistence: shell, direnv, git, systemd user and Rex config are
 #     read-only, so the agent cannot plant code that a later shell runs.
 # /tmp is private. A soft boundary against prompt injection and mistakes;
@@ -65,7 +67,7 @@ writeShellApplication {
 
     hide \
       "$HOME/.ssh" "$HOME/.gnupg" "$HOME/.config/sops" "$HOME/.local/state/rex" \
-      /run/secrets.d /run/secrets-for-users.d \
+      /run/secrets.d /run/secrets-for-users.d /run/tailscale \
       "$run/secrets.d" "$run/gnupg" "$run/bus" "$run/systemd" "$run/rex"
     if [ -d "$keys" ]; then
       args+=(--ro-bind "$keys" "$keys")

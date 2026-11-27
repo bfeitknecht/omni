@@ -91,19 +91,9 @@ let
 
         home-manager.users.${config.flake.username} = {
           # Rex personal server for bf (systemd user service). Clients come in
-          # over ssh (ssh://devil, Tailscale SSH) or over the tailnet: Rex runs its
-          # own Tailscale node `deviler` (https://deviler.<tailnet>.ts.net),
-          # owned by bf's account, so only bf's devices get in. Rex nodes
-          # carry an r; the plain host name is the machine's own tailscaled
-          # node. First start: open the sign-in link from `rex server
-          # status`. The identity stays in ~/.local/state/rex on the PVC.
-          services.rex = {
-            enable = true;
-            tailscale = {
-              enable = true;
-              hostname = "deviler";
-            };
-          };
+          # over Tailscale SSH only (ssh://devil): no own Rex tailnet node
+          # (`deviler` is gone since 2026-11-27).
+          services.rex.enable = true;
 
           # The agents run here as bf, each inside agent-sandbox
           # (_sandbox.nix): no sudo, no keys, no way out to bf's Rex or

@@ -6,7 +6,7 @@ Status as of 2026-11-27. omni is the nix lane: one dendritic flake feeding the M
 
 - Flake shape is settled: flake-parts + import-tree, lix overlay, home-manager as the config carrier, sops-nix for secrets. Classes live in `modules/system/{linux,darwin}.nix`; hosts compose class + host facts; standalone homes derive from the hosts (`nh home switch` on every host).
 - Home modules: shell (zsh/zimfw + nushell `use user *`), tools (incl. `yq-go`), git (delta, tea, gh, glab; jujutsu removed 2026-11-25), editor (nvf + helix), nix tooling, gpg identity, ssh (per-service keys; `devil` over Tailscale SSH), agents (`agents.md` for opencode and Claude Code, model keys from sops, no MCP servers), Rex, xdg (tools out of ~).
-- Hosts: `anti` (darwin), `devil` (NixOS, Kata VM image, x86_64-linux; access only by Tailscale SSH, tailnet node `devil`; Rex node `deviler`; no sshd), `vm` (microvm test bed).
+- Hosts: `anti` (darwin; Tailscale SSH via the open-source tailscaled, `tag:anti`), `devil` (NixOS, Kata VM image, x86_64-linux; access only by Tailscale SSH, tailnet node `devil`; Rex over Tailscale SSH (`ssh://devil`), no Rex node; no sshd), `vm` (microvm test bed).
 - No images (removed 2026-11-27). devil has its own opencode build (`hosts/_opencode.nix`).
 - The old MacBook (`echo`) is still the daily driver; the move to `anti` is gated on the parity work below. What can move: `docs/MIGRATION.md`.
 
