@@ -62,7 +62,7 @@ after, one piece at a time. What the baseline has:
    paste; the script asks for it):
 
    ```sh
-   curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
+   curl -fsSL https://git.0xbf.ch/bf/omni/raw/branch/master/install.sh | sh -s -- anti
    ```
 
    It installs the Xcode Command Line Tools, Lix, the age key, clones omni to

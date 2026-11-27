@@ -1,7 +1,7 @@
 #!/bin/sh
 # omni installer: a factory-fresh Mac to a configured host in one command.
 #
-#   curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
+#   curl -fsSL https://git.0xbf.ch/bf/omni/raw/branch/master/install.sh | sh -s -- anti
 #
 # Steps (each is skipped when it is already done, so a re-run is safe):
 #   1. checks: macOS on Apple silicon, not root, a known host, network
@@ -15,14 +15,18 @@
 #   9. the wallpaper (apex NULL, light or dark as the appearance is now)
 #
 # Options: --dry-run (print the commands, change nothing), --yes (no
-# confirmation prompt), --help. Env: OMNI_REPO (clone URL), OMNI_DIR (path).
+# confirmation prompt), --help. Env: OMNI_REPO (clone URL), OMNI_PUSH (push
+# URL), OMNI_DIR (path).
 #
 # Everything is in main(), called on the last line: a download cut short
 # runs nothing.
 
 set -eu
 
-OMNI_REPO="${OMNI_REPO:-https://github.com/bfeitknecht/omni.git}"
+# Forgejo is the home; GitHub is only a mirror. Clone over https (no ssh
+# key before the first switch); push goes over ssh (OMNI_PUSH).
+OMNI_REPO="${OMNI_REPO:-https://git.0xbf.ch/bf/omni.git}"
+OMNI_PUSH="${OMNI_PUSH:-ssh://git@git.0xbf.ch/bf/omni.git}"
 OMNI_DIR="${OMNI_DIR:-$HOME/Projects/omni}"
 LIX_URL="https://install.lix.systems/lix"
 AGE_KEY="$HOME/.config/sops/age/keys.txt"
@@ -78,7 +82,7 @@ usage() {
   cat <<EOF
 omni installer
 
-  curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- <host> [options]
+  curl -fsSL https://git.0xbf.ch/bf/omni/raw/branch/master/install.sh | sh -s -- <host> [options]
   sh install.sh <host> [options]
 
 Hosts: $DARWIN_HOSTS
@@ -105,9 +109,9 @@ checks() {
     *) die "unknown host '$HOST'. Darwin hosts: $DARWIN_HOSTS" ;;
   esac
 
-  curl -fsS -o /dev/null --max-time 10 https://github.com ||
-    die "no connection to github.com: connect to the network first."
-  ok "network: github.com reachable"
+  curl -fsS -o /dev/null --max-time 10 https://git.0xbf.ch ||
+    die "no connection to git.0xbf.ch: connect to the network first."
+  ok "network: git.0xbf.ch reachable"
 
   if [ -x /usr/bin/fdesetup ] && /usr/bin/fdesetup status 2>/dev/null | grep -q "FileVault is On"; then
     ok "FileVault is on"
@@ -237,6 +241,7 @@ clone() {
   else
     run mkdir -p "$(dirname "$OMNI_DIR")"
     run git clone "$OMNI_REPO" "$OMNI_DIR"
+    run git -C "$OMNI_DIR" remote set-url --push origin "$OMNI_PUSH"
   fi
   # the host must exist in the flake, not only in this script's list
   if [ "$DRY_RUN" -eq 0 ]; then

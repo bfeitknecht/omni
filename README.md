@@ -196,7 +196,7 @@ Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (m
 On a fresh Mac, in Terminal.app (the setup assistant done, FileVault on):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
+curl -fsSL https://git.0xbf.ch/bf/omni/raw/branch/master/install.sh | sh -s -- anti
 ```
 
 `install.sh` checks the machine (macOS, Apple silicon, not root, a known
@@ -215,7 +215,7 @@ New machine with a new age key instead of the shared one: `secrets/README.md`.
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 
 ```nu
-git clone https://github.com/bfeitknecht/omni.git ~/Projects/omni
+git clone https://git.0xbf.ch/bf/omni.git ~/Projects/omni
 cd ~/Projects/omni
 nix run .#vm                    # console autologin; TCG when /dev/kvm is missing
 ```
