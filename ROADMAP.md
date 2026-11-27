@@ -1,13 +1,13 @@
 # Roadmap
 
-Status as of 2026-11-25. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil Kata VM on the talos cluster (x86_64-linux on rzbl), the opencode server image for the cluster, and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md`.
+Status as of 2026-11-27. omni is the nix lane: one dendritic flake feeding the MacBook Pro (`anti`), the devil Kata VM on the talos cluster (x86_64-linux on rzbl), and a microvm test bed. The cluster-side counterpart lives in `infra/ROADMAP.md`.
 
 ## Where things stand
 
 - Flake shape is settled: flake-parts + import-tree, lix overlay, home-manager as the config carrier, sops-nix for secrets. Classes live in `modules/system/{linux,darwin}.nix`; hosts compose class + host facts; standalone homes derive from the hosts (`nh home switch` on every host).
-- Home modules: shell (zsh/zimfw + nushell `use user *`), tools (incl. `yq-go`), git (delta, tea, gh, glab; jujutsu removed 2026-11-25), editor (nvf + helix), nix tooling, gpg identity, ssh (per-service keys; `devil` over Tailscale SSH), agents (`agents.md` for opencode and Claude Code, model keys from sops, no MCP servers), Rex.
+- Home modules: shell (zsh/zimfw + nushell `use user *`), tools (incl. `yq-go`), git (delta, tea, gh, glab; jujutsu removed 2026-11-25), editor (nvf + helix), nix tooling, gpg identity, ssh (per-service keys; `devil` over Tailscale SSH), agents (`agents.md` for opencode and Claude Code, model keys from sops, no MCP servers), Rex, xdg (tools out of ~).
 - Hosts: `anti` (darwin), `devil` (NixOS, Kata VM image, x86_64-linux; access only by Tailscale SSH, tailnet node `devil`; Rex node `deviler`; no sshd), `vm` (microvm test bed).
-- Images: `modules/images/opencode.nix` builds the opencode server image (Nix, `dockerTools.buildLayeredImage`); infra pins this flake in `images/opencode/flake.lock`. One opencode build (`modules/images/opencode/_cli.nix`) serves the pod and devil.
+- No images (removed 2026-11-27). devil has its own opencode build (`hosts/_opencode.nix`).
 - The old MacBook (`echo`) is still the daily driver; the move to `anti` is gated on the parity work below. What can move: `docs/MIGRATION.md`.
 
 ## The two gates
@@ -33,14 +33,27 @@ The first switch is a minimal known-good baseline; rice follows one piece at a t
 
 ## NEXT — devil
 
-Done and live: Kata VM on rzbl, `/nix` on the PVC, Tailscale SSH only (2026-11-24), Rex server, opencode + `oc` (attach to the cluster server), Claude Code. The history (sshd, ghostty-web, Teleport) is in git and in `infra/docs/journey.md`.
+Done and live: Kata VM on rzbl, `/nix` on the PVC, Tailscale SSH only (2026-11-24), Rex server, opencode and Claude Code as bf inside agent-sandbox (`hosts/_sandbox.nix`: no sudo, no keys). The history (sshd, ghostty-web, Teleport) is in git and in `infra/docs/journey.md`.
 
 - [ ] **Make devil nicer** — shell/editor parity inside the VM (it already imports the full home config).
 - [ ] **Forge CLI logins** — `gh`, `tea`, `glab` by hand on devil and anti (atlas `cli-logins`; tokens are not declarative on purpose).
 
+## NOW — light rice on anti (2026-11-27, waits for `nh darwin switch`)
+
+- [x] Dock: Finder, Settings, Ghostty, Zed, Spotify; no recents, no folders.
+- [x] Empty desktop (no icons, no widgets); Finder Quit (Cmd-Q; one logout after the first switch).
+- [x] Lock screen without the large clock (`UsesLargeDateTime`; not verified on macOS 26, the UI fallback is in `macos.nix`).
+- [x] Ghostty: no title bar or buttons, padding, steady block cursor, faded unfocused splits, copy on select, gamma-correct text.
+- [x] Zed: vim mode, format on save via LSP, terminal copy on select; Zed is the plain-text app (Cmd-, in Ghostty).
+- [x] hushlogin; starship error status bold red; bat pages only when needed, no STDIN header.
+- [x] Tools out of ~ (`features/home/xdg.nix`): Claude Code, Vibe, kube, npm, atuin logs, nix profile links.
+- [x] Old Zed settings: the editor group, tabs, tab bar, git panel left, no search or collaboration button, terminal without badge, breadcrumbs, scrollbar. Not carried: theme, AI, languages.
+- [x] Prompt: ASCII for deleted (`-`) and renamed (`~`), like the rest of git_status.
+- [x] No ssh agent forwarding (`ssh.nix`), not even to devil.
+
 ## LATER — rice & iteration (post-reset)
 
-- [ ] Rice: sketchybar, yabai / aerospace / dinky, jankyborders, tuna or raycast, kindavim, karabiner into nix, App Store apps (`masApps`), login screen without the clock, a dynamic (light/dark) wallpaper — one piece at a time, each behind `nh darwin switch`.
+- [ ] Rice: sketchybar, yabai / aerospace / dinky, jankyborders, tuna or raycast, kindavim, karabiner into nix, App Store apps (`masApps`), a dynamic (light/dark) wallpaper — one piece at a time, each behind `nh darwin switch`.
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
 - [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same home config) before touching the real VM. Note: devil is x86_64-linux now; the microvm on the Mac is aarch64-linux.

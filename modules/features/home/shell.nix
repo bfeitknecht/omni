@@ -45,9 +45,9 @@
             status = {
               # off by default in starship: without this [ERR] never shows
               disabled = false;
-              # the one colour in the prompt: red on error (ANSI red)
+              # the one colour in the prompt: bold red on error (ANSI red)
               format = ''\[$status\]($style)'';
-              style = "red";
+              style = "bold red";
             };
             git_branch.format = "$branch";
             git_state = {
@@ -75,6 +75,9 @@
               conflicted = "!" + count;
               modified = "*" + count;
               staged = "+" + count;
+              # starship defaults are the symbols ✘ and »: ASCII like the rest
+              deleted = "-" + count;
+              renamed = "~" + count;
             };
             custom.prompt = {
               description = "The left prompt (conditional)";
@@ -155,16 +158,20 @@
       # MANROFFOPT=-c: groff emits overstrike instead of SGR — col strips
       # overstrikes cleanly but eats the "\x1b[" of SGR sequences, which
       # used to leak literal fragments (1m, 0m, 4m) into the pager input.
+      # PAGER is bat --plain: piped text (tldr, git without delta, ...) gets
+      # no header, no grid, no "STDIN" title. bat pages through less -RF,
+      # and -F quits at once when the text fits the screen.
       home.sessionVariables = {
         MANROFFOPT = "-c";
         MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-        PAGER = "bat";
+        PAGER = "bat --plain";
       };
 
       programs.bat = {
         enable = true;
         config = {
           paging = "auto";
+          pager = "less -RF";
         };
       };
 

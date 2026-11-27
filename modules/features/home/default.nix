@@ -13,6 +13,7 @@
       secrets
       rex
       agents
+      xdg
     ];
 
     home.stateVersion = "26.11";

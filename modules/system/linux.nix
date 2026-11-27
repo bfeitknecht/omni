@@ -26,6 +26,10 @@
       "nix-command"
       "flakes"
     ];
+    # flakes only: no channels (no ~/.nix-defexpr), and the per-user nix
+    # links under ~/.local/state/nix, not in ~ (features/home/xdg.nix)
+    nix.channel.enable = false;
+    nix.settings.use-xdg-base-directories = true;
 
     # no .home — NixOS derives /home/<name> for isNormalUser
     users.users.${config.flake.username} = {

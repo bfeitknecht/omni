@@ -28,6 +28,6 @@ in
   # lazy on purpose — the host configs are forced at output-read time
   # (nh, nix flake check), never during the flake-parts merge
   flake.homeConfigurations = lib.mapAttrs' (
-    host: cfg: lib.nameValuePair "${user}@${host}" (mkHome cfg.pkgs.system)
+    host: cfg: lib.nameValuePair "${user}@${host}" (mkHome cfg.pkgs.stdenv.hostPlatform.system)
   ) (config.flake.nixosConfigurations // config.flake.darwinConfigurations);
 }

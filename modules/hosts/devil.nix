@@ -7,7 +7,7 @@
 let
   # x86_64-linux since 2026-11-23: devil moved to rzbl (amd64 Blade). Kata
   # VMs on rbpi (arm64 Pi) wedged within minutes and left orphan qemus that
-  # poisoned the node; amd64 KVM on rzbl is stable (opencode Kata runs there).
+  # poisoned the node; amd64 KVM on rzbl is stable.
   system = "x86_64-linux";
 
   # let-bound so the tarball package below can reference the configuration
@@ -105,29 +105,22 @@ let
             };
           };
 
-          # Two tiers. `opencode`: the hands-on agent, running here as bf
-          # (its background service holds the sessions; Zed remote, Rex and
-          # the TUI all reach the same ones; providers and MCP from
-          # features/home/agents.nix). `oc`: hands-off work on the isolated
-          # server in the cluster (infra applications/opencode, Kata VM, bot
-          # identity); the session runs in that VM, devil is only the screen.
-          # One OpenCode build for both (images/opencode/_cli.nix); infra's
-          # images/opencode/flake.lock decides when the pod follows. The v2
-          # server always requires a password:
-          # OPENCODE_PASSWORD comes from sops, the same value as infra
-          # opencode-secrets key server-password.
+          # The agents run here as bf, each inside agent-sandbox
+          # (_sandbox.nix): no sudo, no keys, no way out to bf's Rex or
+          # systemd. opencode (its background service holds the sessions;
+          # Zed remote, Rex and the TUI all reach the same ones; providers
+          # from features/home/agents.nix) and Claude Code. From the phone:
+          # Rex into devil.
           home.packages =
             let
-              # the same build as the pod's image (images/opencode/_cli.nix)
-              opencode = pkgs.callPackage ../images/opencode/_cli.nix { };
+              sandbox = pkgs.callPackage ./_sandbox.nix { };
+              sandboxed =
+                name: pkg: pkgs.writeShellScriptBin name ''exec ${lib.getExe sandbox} ${lib.getExe pkg} "$@"'';
             in
             [
-              pkgs.claude-code
-              opencode
-              (pkgs.writeShellScriptBin "oc" ''
-                export OPENCODE_PASSWORD="$(cat /run/secrets/opencode/server-password)"
-                exec ${lib.getExe opencode} --server http://opencode.opencode.svc "$@"
-              '')
+              sandbox
+              (sandboxed "claude" pkgs.claude-code)
+              (sandboxed "opencode" (pkgs.callPackage ./_opencode.nix { }))
             ];
         };
         # declarative password
@@ -137,12 +130,6 @@ let
           defaultSopsFile = ../../secrets/secrets.sops.yaml;
           age.keyFile = "/home/${config.flake.username}/.config/sops/age/keys.txt";
           secrets."login/devil".neededForUsers = true;
-          # opencode server password (same value as infra opencode-secrets
-          # server-password); the `oc` wrapper reads it at runtime
-          secrets."opencode/server-password" = {
-            mode = "0400";
-            owner = config.flake.username;
-          };
         };
       })
     ];

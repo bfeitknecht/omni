@@ -1,9 +1,0 @@
-{
-  "name": "opencode-sandbox-pin",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Pins the opencode-sandbox plugin for the agent image (omni modules/images/opencode.nix).",
-  "dependencies": {
-    "opencode-sandbox": "0.7.0"
-  }
-}

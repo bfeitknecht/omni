@@ -36,7 +36,9 @@
         # capitalized names: they must override HM's defaults for these exact
         # keys (ssh_config is first-match-wins, duplicates would lose)
         settings."*" = {
-          ForwardAgent = true;
+          # no agent forwarding, not even to devil: there the coding agents
+          # could use the Mac's keys. devil has its own keys (sops).
+          ForwardAgent = false;
           AddKeysToAgent = true;
           IdentitiesOnly = true;
           ServerAliveInterval = 300;

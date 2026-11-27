@@ -39,6 +39,8 @@ stashed = "\\$${count}"
 conflicted = "!${count}"
 modified = "*${count}"
 staged = "+${count}"
+deleted = "-${count}"
+renamed = "~${count}"
 
 
 [git_state]
@@ -133,26 +135,54 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │   └── homes.nix         standalone homeConfigurations (bf@host) — derived from the OS hosts, for `nh home switch`
 ├── system/               cross-host OS classes + identity
 │   ├── user.nix          user identity (flake.username)
-│   ├── linux.nix         flake.modules.nixos.default — the shared NixOS class (hm wiring, lix, zsh gotchas)
-│   └── darwin.nix        flake.modules.darwin.default — the shared darwin class
+│   ├── linux.nix         flake.modules.nixos.default — the shared NixOS class (hm wiring, lix, zsh gotchas, no channels)
+│   ├── darwin.nix        flake.modules.darwin.default — the shared darwin class
+│   └── macos.nix         macOS settings: Dock, empty desktop, lock screen, Finder Quit, hushlogin
 ├── features/
 │   └── home/             the home-manager class tree, exported as flake.modules.homeManager.*
 │       ├── default.nix   aggregator: imports all classes, home.stateVersion lives here
-│       ├── shell.nix     zsh (zimfw), nushell (`use user *`), zoxide, direnv
-│       ├── tools.nix     rg fd bat eza bottom television uv + dust yq tlrc age sops lua deno
+│       ├── shell.nix     zsh (zimfw), nushell (`use user *`), starship, bat as pager, zoxide, direnv, atuin
+│       ├── tools.nix     rg fd bat eza bottom television uv carapace yazi lazygit + dust yq tlrc age sops lua
+│       ├── theme.nix     ANSI colours only (bat, delta, LS_COLORS, both command lines)
 │       ├── git.nix       git delta tea glab gh
-│       ├── editor.nix    neovim (nvf), helix
+│       ├── editor.nix    neovim (nvf); Zed user settings (vim mode, editor, layout, format on save via LSP); Zed as plain-text app (darwin)
 │       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
 │       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
-│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil over Tailscale SSH)
-│       ├── rex.nix       Rex client everywhere; init.lua lists devil (ssh://devil; the server runs on devil)
+│       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil over Tailscale SSH), no agent forwarding
+│       ├── rex.nix       Rex CLI everywhere (the flake's package, macOS too); init.lua lists devil (ssh://devil)
+│       ├── agents.nix    agents.md for opencode and Claude Code (~/.config/claude), model keys from sops
+│       ├── xdg.nix       tools moved out of ~ (kube, npm, vibe, atuin logs, nix profile links)
 │       └── secrets.nix   sops-nix HM module + age key location
 └── hosts/                self-contained host files; they call nixosSystem/darwinSystem themselves
     ├── vm.nix            nixosConfigurations.vm + packages.vm (microvm runner)
-    ├── devil.nix         nixosConfigurations.devil + packages.devil (rootfs tarball)
+    ├── devil.nix         nixosConfigurations.devil + packages.devil (rootfs tarball); opencode + Claude Code
+    ├── _opencode.nix     the opencode v2 build for devil (npm @opencode/cli; nixpkgs lags)
+    ├── _sandbox.nix      agent-sandbox (bubblewrap): no sudo, no keys, no way out to Rex or systemd
     └── anti.nix          darwinConfigurations.anti
 ```
+
+## XDG: what stays in ~
+
+Everything that can move lives under `~/.config`, `~/.cache`, `~/.local`
+(`features/home/xdg.nix`). These stay, because the tool has no setting for it
+or must find them before any config is read:
+
+| Path                   | Why                                                                     |
+| ---------------------- | ----------------------------------------------------------------------- |
+| `.ssh`, `.gnupg`       | keys; ssh has no XDG setting, gpg stays by choice                       |
+| `.zshenv`              | zsh reads it before `ZDOTDIR` is known; it only sets `ZDOTDIR`          |
+| `.hushlogin` (anti)    | `login(1)` looks for it in ~ only                                       |
+| `.zed_server` (devil)  | Zed remote puts its server binary there; no setting                     |
+| `.agents/skills`       | the shared agent skills directory (Rex skill); no setting               |
+| `.orbstack` (anti)     | OrbStack's own state; `.docker` stays too (OrbStack's docker context)   |
+| `Library`, `.Trash`    | macOS                                                                   |
+
+After a switch, move or delete the old copies by hand: `~/.claude` and
+`~/.claude.json` to `~/.config/claude/` (`.claude.json` inside it),
+`~/.vibe` to `~/.config/vibe`; delete `~/.kube/cache`, `~/.npm`, `~/.atuin`,
+`~/.nix-defexpr`, `~/.nix-profile` and devil's stale `~/.terminfo` (devil has
+ghostty's terminfo system-wide).
 
 classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`; hosts compose a class with host facts (the platform string is declared once per host); `homes.nix` derives a standalone home per host, so `nh home switch` works on every machine.
 

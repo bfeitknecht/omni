@@ -11,9 +11,33 @@
           # follow the system appearance
           theme = "light:Builtin Light,dark:Builtin Dark";
           font-family = "CommitMono Nerd Font";
+          # gamma-correct blending: anti-aliased text without the thin, light
+          # edges of the native blending (dark text on light most of all)
+          alpha-blending = "linear-corrected";
+
+          # A bare window: no title bar, no traffic-light buttons, no size
+          # overlay. Even padding all round.
+          macos-titlebar-style = "hidden";
+          resize-overlay = "never";
+          window-padding-x = 10;
+          window-padding-y = 8;
+          window-padding-balance = true;
+
+          # The focused split is clear: the others fade to half.
+          unfocused-split-opacity = 0.5;
+
+          # A steady block cursor, also at the prompt (no-cursor: the shell
+          # integration does not change it to a bar)
+          cursor-style = "block";
+          cursor-style-blink = false;
+          mouse-hide-while-typing = true;
+
+          # a selection goes to the system clipboard at once
+          copy-on-select = "clipboard";
+
           # ssh: install xterm-ghostty's terminfo on the remote host when it
           # has none, else fall back to TERM=xterm-256color
-          shell-integration-features = "ssh-terminfo,ssh-env";
+          shell-integration-features = "no-cursor,ssh-terminfo,ssh-env";
         };
       };
 
