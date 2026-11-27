@@ -33,7 +33,6 @@ Status as of 2026-11-27. omni is the nix lane: one dendritic flake for the MacBo
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Make devil nicer** — shell and editor parity inside the VM.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
-- [ ] `use-xdg-base-directories` in the home nix.conf warns on devil (bf is not trusted); the system nix.conf has it already. Drop it from the home side once HM's profile path is checked.
 - [ ] vm stays the nixos iteration loop: stage devil changes in the microvm before the real VM.
 
 ## SOMEDAY

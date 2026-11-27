@@ -29,13 +29,14 @@
       # atuin: the logs (~/.atuin/logs); config and data already follow XDG
       programs.atuin.settings.logs.dir = "${stateHome}/atuin/logs";
 
-      # nix: ~/.nix-profile and ~/.nix-defexpr move to ~/.local/state/nix
-      # (HM follows the setting for its own profile path). Linux only: the
-      # system nix.conf sets it too (system/linux.nix). On darwin the lix
-      # installer owns /etc/nix/nix.conf and bf is not trusted, so the daemon
-      # ignored it with a warning; anti keeps the two links in ~.
-      nix.settings.use-xdg-base-directories = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (
-        lib.mkDefault true
-      );
+      # nix: the per-user links (~/.nix-profile, ~/.nix-defexpr) go to
+      # ~/.local/state/nix. The system nix.conf sets it (system/linux.nix);
+      # a home nix.conf must not: bf is not a trusted user, so the daemon
+      # warned on every nix command. Only a standalone home (`nh home
+      # switch`) sets it, because HM takes its profile path from it there;
+      # inside a host the profile is /etc/profiles/per-user anyway.
+      nix.settings.use-xdg-base-directories = lib.mkIf (
+        pkgs.stdenv.hostPlatform.isLinux && !config.submoduleSupport.enable
+      ) (lib.mkDefault true);
     };
 }
