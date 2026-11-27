@@ -197,6 +197,16 @@
         extraConfig = lib.mkMerge [
           ''
             $env.STARSHIP_SHELL = "nu"
+
+            # ctrl-l clears the scrollback too, not only the screen (Cmd-K in
+            # Zed sends it, editor.nix)
+            $env.config.keybindings ++= [{
+              name: clear_scrollback
+              modifier: control
+              keycode: char_l
+              mode: [emacs vi_insert vi_normal]
+              event: { send: ClearScrollback }
+            }]
             $env.config.render_right_prompt_on_last_line = false
 
             # The prompt is monochrome in both shells, red on error aside:

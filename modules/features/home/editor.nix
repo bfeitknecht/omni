@@ -49,6 +49,19 @@
         # always there: Nix syntax and the nil language server (nil itself
         # comes from each project's dev shell, through direnv)
         extensions = [ "nix" ];
+        # Cmd-K in the terminal: Zed clears its buffer behind the shell's back,
+        # so nushell (reedline) still has its old prompt row and jumps back
+        # there on Enter. Send ctrl-l instead: the shell clears (nushell:
+        # ClearScrollback, shell.nix) and redraws its prompt itself.
+        userKeymaps = [
+          {
+            context = "Terminal";
+            bindings."cmd-k" = [
+              "terminal::SendKeystroke"
+              "ctrl-l"
+            ];
+          }
+        ];
         userSettings = {
           # editor (from the old settings, .private/settings.json)
           vim_mode = true;
