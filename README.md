@@ -194,7 +194,7 @@ classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`
 On a fresh Mac, in Terminal.app (the setup assistant done, FileVault on):
 
 ```sh
-curl -fsSL https://git.0xbf.ch/bf/omni/raw/branch/master/install.sh | sh -s -- anti
+curl -fsSL https://raw.githubusercontent.com/bfeitknecht/omni/master/install.sh | sh -s -- anti
 ```
 
 `install.sh` checks the machine (macOS, Apple silicon, not root, a known
@@ -214,7 +214,7 @@ After the first switch, by hand:
 2. Tailscale (the open-source tailscaled, no app):
    `sudo tailscale up --ssh --accept-routes --hostname=anti --advertise-tags=tag:anti`,
    open the link. Check `ssh devil hostname`.
-3. Clone the repos to `~/Projects/<repo>` (`ssh://git@git.0xbf.ch/bf/<repo>.git`).
+3. Clone the repos to `~/Projects/<repo>` (`git@github.com:bfeitknecht/<repo>.git`).
 4. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`.
 5. Check the internal CA: `security verify-cert -c ~/Projects/omni/certs/internal-ca.crt`.
 6. atuin logs in from sops at the switch: check `atuin status`.
@@ -225,7 +225,7 @@ New machine with a new age key instead of the shared one: `secrets/README.md`.
 ### vm — the microvm test bed (on a NixOS host, e.g. the orbstack nixos vm)
 
 ```nu
-git clone https://git.0xbf.ch/bf/omni.git ~/Projects/omni
+git clone https://github.com/bfeitknecht/omni.git ~/Projects/omni
 cd ~/Projects/omni
 nix run .#vm                    # console autologin; TCG when /dev/kvm is missing
 ```
