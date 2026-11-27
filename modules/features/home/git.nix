@@ -4,6 +4,9 @@
       enable = true;
       settings = {
         init.defaultBranch = "master";
+        # HTTPS to Forgejo with the token tea stores (`tea login add`);
+        # GitHub: gh adds its own helper (programs.gh.gitCredentialHelper)
+        credential."https://git.0xbf.ch".helper = "!${pkgs.lib.getExe pkgs.tea} login helper";
         user = {
           name = "Basil Feitknecht";
           email = "bfeitknecht@ethz.ch";
