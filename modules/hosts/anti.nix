@@ -45,16 +45,13 @@ in
             "signal"
             "discord"
             ## rice
-            # need stats and raycast?
-            # what WM? yabai, aerospace, dinky
-            # what launcher? raycast, tuna
+            # "dinky"
+            # "tuna"
             # "kindavim"
-            # "FelixKratz/borders" # jankyborders
             # "FelixKratz/sketchybar" # how to add tap?
-            # "stats"
-            # how to do keyboard remaps and stuff (currently karabiner)
-            # hammerspoon
-            # skbd
+            # "ukulele"
+            # "hammerspoon"
+            # "stats" # ?
           ];
         };
       }
