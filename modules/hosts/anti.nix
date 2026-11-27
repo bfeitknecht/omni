@@ -45,10 +45,11 @@ in
             "signal"
             "discord"
             ## rice
-            # "dinky"
+            # "mikker/tap/dinky" # tiling wm, no SIP change; cask in the tap mikker/tap (homebrew.taps)
             # "tuna"
             # "kindavim"
-            # "FelixKratz/sketchybar" # how to add tap?
+            # sketchybar: no tap, no cask: services.sketchybar (nix-darwin); also
+            # services.jankyborders and services.aerospace
             # "ukulele"
             # "hammerspoon"
             # "stats" # ?
