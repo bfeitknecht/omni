@@ -136,8 +136,9 @@ manual_notice() {
         $AGE_KEY before you start
     After:
       - log out and in once (Finder and trackpad settings apply then)
-      - Tailscale app: sign in; App Store sign-in for store apps
-      - docs/RESET.md section C has the rest (repos, kubeconfig, CLI logins)
+      - Tailscale: sudo tailscale up --ssh --accept-routes --hostname=$HOST --advertise-tags=tag:$HOST
+      - App Store sign-in for store apps
+      - README.md "After the first switch" has the rest (repos, kubeconfig, CLI logins)
 EOF
 }
 
@@ -341,8 +342,8 @@ done_notice() {
     Now:
       1. Open a new terminal (Ghostty), so the new shell and PATH load.
       2. Log out and in once.
-      3. Tailscale: sign in in the app (name: $HOST).
-      4. The rest: $OMNI_DIR/docs/RESET.md section C.
+      3. Tailscale: sudo tailscale up --ssh --accept-routes --hostname=$HOST --advertise-tags=tag:$HOST
+      4. The rest: $OMNI_DIR/README.md, "After the first switch".
 EOF
 }
 

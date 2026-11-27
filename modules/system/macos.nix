@@ -5,7 +5,7 @@ in
 {
   # macOS settings for every darwin host. Function first; the look (menu
   # bar, appearance, Liquid Glass, window behaviour) is worked out one piece
-  # at a time; echo's full set is in docs/MIGRATION.md section 1 to pick from.
+  # at a time (ROADMAP, rice).
   flake.modules.darwin.macos =
     { config, lib, ... }:
     {

@@ -191,8 +191,6 @@ classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`
 
 ### macbook (`anti`)
 
-Moving from the old MacBook (`echo`): `docs/MIGRATION.md` lists what can move (macOS settings, casks, fonts, configs, data). The order of the day: `docs/RESET.md`.
-
 On a fresh Mac, in Terminal.app (the setup assistant done, FileVault on):
 
 ```sh
@@ -209,6 +207,18 @@ nix-darwin that `flake.lock` pins. Each step is skipped when it is done, so a
 re-run is safe. `--dry-run` prints the commands without running them.
 
 From then on, from anywhere: `nh darwin switch`.
+
+After the first switch, by hand:
+
+1. Open Ghostty; log out and in once (Finder and trackpad apply then).
+2. Tailscale (the open-source tailscaled, no app):
+   `sudo tailscale up --ssh --accept-routes --hostname=anti --advertise-tags=tag:anti`,
+   open the link. Check `ssh devil hostname`.
+3. Clone the repos to `~/Projects/<repo>` (`ssh://git@git.0xbf.ch/bf/<repo>.git`).
+4. infra: `cd talos; topf talosconfig` and `topf kubeconfig | save -f ../kubeconfig`.
+5. Check the internal CA: `security verify-cert -c ~/Projects/omni/certs/internal-ca.crt`.
+6. atuin logs in from sops at the switch: check `atuin status`.
+7. CLI logins: `gh`, `tea` (devil also `glab`). Rex app: add `ssh://bf@devil`.
 
 New machine with a new age key instead of the shared one: `secrets/README.md`.
 
