@@ -13,6 +13,10 @@
         any-nix-shell
         comma
         nix-output-monitor
+        # the Nix language server and formatter in every directory, also
+        # without a dev shell (Zed, nvim)
+        nil
+        nixfmt
       ];
 
       # nix-index/nix-locate wrapped with the prebuilt database (no full

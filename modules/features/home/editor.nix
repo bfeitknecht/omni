@@ -46,8 +46,8 @@
       programs.zed-editor = {
         enable = true;
         package = null;
-        # always there: Nix syntax and the nil language server (nil itself
-        # comes from each project's dev shell, through direnv)
+        # always there: Nix syntax and the nil language server (nil and
+        # nixfmt come from features/home/nix.nix, a dev shell can override)
         extensions = [ "nix" ];
         # Cmd-K in the terminal: Zed clears its buffer behind the shell's back,
         # so nushell (reedline) still has its old prompt row and jumps back
@@ -114,6 +114,8 @@
             show_nav_history_buttons = false;
           };
           git_panel.dock = "left";
+          # nil formats with nixfmt (format on save through the language server)
+          lsp.nil.initialization_options.formatting.command = [ "nixfmt" ];
           # the bottom dock (terminal) spans the full window width
           bottom_dock_layout = "full";
           search.button = false;

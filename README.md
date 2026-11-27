@@ -146,7 +146,7 @@ modules/                  import-tree root; every .nix here is a flake-parts mod
 │       ├── theme.nix     ANSI colours only (bat, delta, LS_COLORS, both command lines)
 │       ├── git.nix       git delta tea glab gh
 │       ├── editor.nix    neovim (nvf); Zed user settings (vim mode, editor, layout, format on save via LSP); Zed as plain-text app (darwin)
-│       ├── nix.nix       nh comma nom any-nix-shell, nix.settings, lix as nix.package
+│       ├── nix.nix       nh comma nom any-nix-shell, nil and nixfmt everywhere, nix.settings, lix as nix.package
 │       ├── gpg.nix       gpg identity (sops) + commit/tag signing
 │       ├── ghostty.nix   ghostty (macOS: HM owns the config, the app comes from the cask)
 │       ├── ssh.nix       ssh keys (public in-tree, private via sops), host entries (git :22, devil and anti over Tailscale SSH via tailscale nc), no agent forwarding
