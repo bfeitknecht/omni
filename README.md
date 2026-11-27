@@ -177,11 +177,12 @@ or must find them before any config is read:
 | `.agents/skills`       | the shared agent skills directory (Rex skill); no setting               |
 | `.orbstack` (anti)     | OrbStack's own state; `.docker` stays too (OrbStack's docker context)   |
 | `Library`, `.Trash`    | macOS                                                                   |
+| `.nix-profile`, `.nix-defexpr` (anti) | the lix installer owns `/etc/nix/nix.conf`; bf is not trusted |
 
 After a switch, move or delete the old copies by hand: `~/.claude` and
 `~/.claude.json` to `~/.config/claude/` (`.claude.json` inside it),
 `~/.vibe` to `~/.config/vibe`; delete `~/.kube/cache`, `~/.npm`, `~/.atuin`,
-`~/.nix-defexpr`, `~/.nix-profile` and devil's stale `~/.terminfo` (devil has
+devil's `~/.nix-defexpr` and `~/.nix-profile`, and its stale `~/.terminfo` (devil has
 ghostty's terminfo system-wide).
 
 classes contribute one module each to `flake.modules.{nixos,darwin,homeManager}`; hosts compose a class with host facts (the platform string is declared once per host); `homes.nix` derives a standalone home per host, so `nh home switch` works on every machine.

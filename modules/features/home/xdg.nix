@@ -3,7 +3,12 @@
   # directories. Only what each tool supports itself (an env var or a
   # setting); no wrappers. What stays in ~ and why: README.md (XDG).
   flake.modules.homeManager.xdg =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       inherit (config.xdg) configHome cacheHome stateHome;
     in
@@ -25,7 +30,12 @@
       programs.atuin.settings.logs.dir = "${stateHome}/atuin/logs";
 
       # nix: ~/.nix-profile and ~/.nix-defexpr move to ~/.local/state/nix
-      # (HM follows the setting for its own profile path). Lix supports it.
-      nix.settings.use-xdg-base-directories = lib.mkDefault true;
+      # (HM follows the setting for its own profile path). Linux only: the
+      # system nix.conf sets it too (system/linux.nix). On darwin the lix
+      # installer owns /etc/nix/nix.conf and bf is not trusted, so the daemon
+      # ignored it with a warning; anti keeps the two links in ~.
+      nix.settings.use-xdg-base-directories = lib.mkIf pkgs.stdenv.hostPlatform.isLinux (
+        lib.mkDefault true
+      );
     };
 }
