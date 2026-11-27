@@ -114,6 +114,8 @@
             show_nav_history_buttons = false;
           };
           git_panel.dock = "left";
+          # the bottom dock (terminal) spans the full window width
+          bottom_dock_layout = "full";
           search.button = false;
           collaboration_panel.button = false;
 
