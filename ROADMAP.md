@@ -54,6 +54,7 @@ Done and live: Kata VM on rzbl, `/nix` on the PVC, Tailscale SSH only (2026-11-2
 ## LATER — rice & iteration (post-reset)
 
 - [ ] Rice: sketchybar, yabai / aerospace / dinky, jankyborders, tuna or raycast, kindavim, karabiner into nix, App Store apps (`masApps`), a dynamic (light/dark) wallpaper — one piece at a time, each behind `nh darwin switch`.
+- [ ] **Agents drive Rex** — agent-sandbox hides the Rex socket today: a Rex session runs outside the sandbox, so Rex access is a way out (to the age key, sudo). Needs a Rex permission scope (sessions for the agent only, no new shell as bf) or the agents as their own user with their own Rex server.
 - [ ] **Configure nvf** — deeper neovim config in `editor.nix`.
 - [ ] **Expose apps/tools from the flake** — `packages`/`apps` outputs (nvim, home) runnable without a host switch.
 - [ ] vm stays the nixos iteration loop: stage devil changes in the microvm (same home config) before touching the real VM. Note: devil is x86_64-linux now; the microvm on the Mac is aarch64-linux.
