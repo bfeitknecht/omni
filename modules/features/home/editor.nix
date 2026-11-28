@@ -93,6 +93,9 @@
           toolbar.selections_menu = false;
           file_finder.include_ignored = "indexed";
           private_files = [ "**/*.secret" ];
+          # AI edit predictions stay hidden until you hold alt (option);
+          # "subtle" mode, no inline suggestions while typing
+          edit_predictions.mode = "subtle";
           # the cask updates Zed (brew), not Zed itself
           auto_update = false;
 

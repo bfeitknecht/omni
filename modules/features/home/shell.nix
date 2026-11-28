@@ -106,6 +106,11 @@
           enableNushellIntegration = false;
         };
 
+      # the root prompt (zsh): starship.toml with # as the symbol
+      xdg.configFile."starship/root.toml".source = (pkgs.formats.toml { }).generate "starship-root.toml" (
+        lib.recursiveUpdate config.programs.starship.settings { character.success_symbol = "#"; }
+      );
+
       programs.zsh = {
         enable = true;
         dotDir = "${config.xdg.configHome}/zsh";
@@ -133,6 +138,10 @@
 
           # carapace completions need compinit, which zimfw ran just above
           source <(${pkgs.carapace}/bin/carapace _carapace zsh)
+
+          # root (sudo -s keeps this zshrc): the same prompt, with # as the
+          # symbol. starship's character module knows no uid.
+          (( EUID == 0 )) && export STARSHIP_CONFIG="${config.xdg.configHome}/starship/root.toml"
 
           # any-nix-shell's prompt hook is not sourced — its precmd
           # unconditionally re-sets RPROMPT, clobbering starship's
